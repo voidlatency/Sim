@@ -127,7 +127,7 @@ else{
   delay(200000000);
 }
 }
-
+ 
 void SetupScan(){
   // de eerste scan hierbij moeten de posities van de 2 diabolen worden onhouden om oz later ze weer op te kunnen pakken 
 
