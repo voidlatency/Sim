@@ -8,9 +8,9 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "c:/Users/Boyd/Documents/PlatformIO/Projects/Arm/include",
-                "c:/Users/Boyd/Documents/PlatformIO/Projects/Arm/src",
-                "c:/Users/Boyd/Documents/PlatformIO/Projects/Arm/.pio/libdeps/uno/Stepper/src",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/include",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/src",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/Stepper/src",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/variants/standard",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
@@ -24,9 +24,9 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Arm/include",
-                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Arm/src",
-                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Arm/.pio/libdeps/uno/Stepper/src",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/include",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/src",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/Stepper/src",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/variants/standard",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
