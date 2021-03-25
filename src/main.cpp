@@ -135,7 +135,7 @@ void SetupScan(){
   //1.beginnen met rond draaien
   //2. het uitlezen van de servo
 
-
+ //test
 
 }
 
