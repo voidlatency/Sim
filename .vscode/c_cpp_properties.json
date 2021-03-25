@@ -10,6 +10,7 @@
             "includePath": [
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/include",
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/src",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/AccelStepper/src",
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/Stepper/src",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/variants/standard",
@@ -26,6 +27,7 @@
                 "path": [
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/include",
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/src",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/AccelStepper/src",
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/Stepper/src",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/variants/standard",
