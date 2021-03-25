@@ -12,6 +12,8 @@ int zone[24] = {191, 0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116
 
 //laatste position is 0 aan het begin
 int EndPos = zone[1];
+int StartPos; //is de positie nadat hij de diabolo's heeft gevonden en hij start met het spel
+int StartVlak;   // welke hij van de 4 belangerijke vakken als eerst heeft gekozen om het spel mee te beginnen
 int Steps;
 int StepD;
 
@@ -21,10 +23,10 @@ int PDiabolL;
 int StateDiabolL;
 int StateDiabolH;
 
-int calculateSteps(int Target, int Endpos){
+int calculateSteps(int StartP, int Target){
 //berekening stappen
-int End1 = EndPos;
-int End2 = EndPos + 200;      // 2e variant van dezelfde position
+int End1 = StartP;
+int End2 = StartP + 200;      // 2e variant van dezelfde position
 int StepOption1 = Target - End1;
 int StepOption2 = Target - End2;
 if (abs(StepOption1) <= abs(StepOption2)){
@@ -33,6 +35,7 @@ if (abs(StepOption1) <= abs(StepOption2)){
 else{
   Steps = StepOption2;
 }
+
 // uiteindelijke steps
   return(Steps);
 }
@@ -59,15 +62,39 @@ void ClosestTarget(){
   //bepalen wat het dichtste bij is en dat als start punt bepaalen voor de rest van het traject
 
 
+// alle stappen berekend
+int closestSteps[4];
+
+closestSteps[0] = calculateSteps(StartPos, zone[8]);
+closestSteps[1] = calculateSteps(StartPos, zone[18]);
+closestSteps[2] = calculateSteps(StartPos, zone[6]);
+closestSteps[3] = calculateSteps(StartPos, zone[20]);
+
+//vind het kleinste getal
+
+int closest, num ,i;
+
+
+for (i = 0; i < num; i++){
+      scanf("%d", &closestSteps[i]);
+}
+//Consider first element as smallest
+closest = closestSteps[0];
+ 
+for (i = 0; i < num; i++) {
+  if (closestSteps[i] < closest) {
+      closest = closestSteps[i];
+    }
+  }
+ 
+   // Print out the Result
+   printf("\nkleinste hoeveelheid stappen naar hoogwaardige vak%d", closest);
 
 
 
+// nog een check om het Startvalk te defineeren 
 
 
-
-
-
-  
 }
 
 void DiabolotoCenter(){
