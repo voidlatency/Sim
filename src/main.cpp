@@ -15,7 +15,7 @@ Stepper StepperEnd = Stepper(StepperEndRPM, 12, 13);
 //zet zones op en geeft deze waardes op opgeroepen te worden zie foto verdeling voor veder uitleg
 int zone[24] = {191, 0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125, 133, 142, 150, 158, 166, 175, 183};
 
-
+//test
 //laatste position is 0 aan het begin
 int EndPos = zone[1];
 int StartPos; //is de positie nadat hij de diabolo's heeft gevonden en hij start met het spel
