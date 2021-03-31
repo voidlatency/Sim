@@ -10,6 +10,7 @@
             "includePath": [
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/include",
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/src",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/Servo/src",
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/StepperDriver/src",
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/AccelStepper/src",
                 "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/Stepper/src",
@@ -28,6 +29,7 @@
                 "path": [
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/include",
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/src",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/Servo/src",
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/StepperDriver/src",
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/AccelStepper/src",
                     "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/Stepper/src",
@@ -62,3 +64,4 @@
     ],
     "version": 4
 }
+
