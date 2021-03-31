@@ -8,10 +8,10 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/include",
-                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/src",
-                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/AccelStepper/src",
-                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/Stepper/src",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/include",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/src",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/AccelStepper/src",
+                "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/Stepper/src",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/cores/arduino",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/variants/standard",
                 "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
@@ -25,10 +25,10 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/include",
-                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/src",
-                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/AccelStepper/src",
-                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/.pio/libdeps/uno/Stepper/src",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/include",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/src",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/AccelStepper/src",
+                    "c:/Users/Boyd/Documents/PlatformIO/Projects/Sim/Sim/.pio/libdeps/uno/Stepper/src",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/cores/arduino",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/variants/standard",
                     "C:/Users/Boyd/.platformio/packages/framework-arduino-avr/libraries/EEPROM/src",
