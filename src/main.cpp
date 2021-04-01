@@ -2,6 +2,8 @@
 #include <BasicStepperDriver.h>
 #include <servo.h>
 
+
+
 //rpm per motor
 #define StepperHeadRPM 200
 #define StepperEndRPM 200
@@ -85,6 +87,8 @@ int SonicDistance;
 bool Diabololaying;  
 bool Diabolostanding;
 
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // calculation functions
 int calculateSteps(int StartP, int Target){
@@ -115,6 +119,8 @@ int calculateDistanceSteps(int Distance){ // in cm
   return(StepDistance);  
   
 }
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //position functions
@@ -211,9 +217,7 @@ void sonic(){
   digitalWrite(TrigPin, LOW);
   duration = pulseIn(EchoPin, HIGH);
   distance = duration * 0.034 / 2;   // rekent afstand in cm
-  SonicDistance = distance; 
- 
-  
+  SonicDistance = distance;  
 }
 
 
@@ -221,8 +225,6 @@ void sonic(){
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //safety functions
-
-
 void EndTimer(){
 // kijken of hij de 5 min overschrijd 
 int seconds;  
@@ -241,6 +243,11 @@ else{
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 //game functions
+
+/*een van de blangerijskte functies moeten heel veel testen of dit wel werkt en of we bepaalde dingen over het hoofd hebben gezien 
+mijn vermoeden is ook dat er iets fout gaat bij het uilezen van de sensor omdat hij dit maar een keer odet waneer hij over een vlak heen gaat*/
+
+
 void Begin(){
 int unknown = 0;
 int i;
@@ -255,22 +262,23 @@ calculateSDelay(8, StepperBaseRPM);                     //bereken delay
 
 sonic();      //hij update de lengte waneer hij in positie is als er iets onder is  
 delay(20);
+Serial.println("hij is aan het zoeken naar de 1e diabol");
 
 //trek conclusie uit waarde is dit de pos van de L of H diabol
-  if (SonicDistance == 1000){
+  if (SonicDistance == 12){
     PDiabolH = zone[i];
     unknown = 1;
-
+    Serial.println("de 1e diabolo is H");
 // hier steld hij de ene array aan de andere
     for(loop = 0; loop < 5; loop++) {
       HdiabolD[loop] = CW[loop];
     }
     
   }
-  if (SonicDistance == 2000){
+  if (SonicDistance == 9){
     PDiabolL = zone[i];
     unknown = 1;
-
+    Serial.println("de 1e diabolo is L");
     // hier steld hij de ene array aan de andere
     for(loop = 0; loop < 5; loop++) {
       LdiabolD[loop] = CW[loop];
@@ -284,24 +292,27 @@ Serial.println("hij gaat nu de 2e diabol zoeken");
 for(unknown = 1 ; unknown == 1; i++){
 
 StepperBase.move(calculateSteps(zone[i], zone[i+1]));
-delay(calculateSDelay(8, StepperBaseRPM));                     //bereken delay 
+delay(calculateSDelay(8, StepperBaseRPM));                  //bereken delay 
 
 sonic();      // hij update de lengte als er iets onder is 
 delay(20);
+Serial.println("hij is aan het zoeken naar de 2e diabol");
 
 //trek conclusie uit waarde is dit de pos van de L of H diabol
-  if (SonicDistance == 1000){
+  if (SonicDistance == 12){
     PDiabolH = zone[i];
     unknown = 2;
+    Serial.println("de 2e diabolo is H");
     // hier steld hij de ene array aan de andere
     for(loop = 0; loop < 5; loop++) {
       HdiabolD[loop] = CCW[loop];
     }
     
   }
-  if (SonicDistance == 2000){
+  if (SonicDistance == 9){
     PDiabolL = zone[i];
     unknown = 2;
+    Serial.println("de 2e diabolo is L");
     // hier steld hij de ene array aan de andere
     for(loop = 0; loop < 5; loop++) {
       LdiabolD[loop] = CCW[loop];
@@ -345,21 +356,10 @@ void SwitchState(){
 
     // de game direction moet vedanderen nadat hij de vorige heeft afgezet 
     // dus rewrite gamestate met Cw als Ddiabol h = 1 en andersom
-    //
-
-
-
-
-
-
-
-
     // switch van state
+
     StateDiabolL = 1;
     StateDiabolH = 0;
-
-
-
 
 
 
@@ -442,15 +442,12 @@ void setup() {
 
 // servo aan pin 10 koppelen
   Gripper.attach(10);
+  Begin();
 }
 
 
 
 void loop() {
-
-
-
-
 
 
 
