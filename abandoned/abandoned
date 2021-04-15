@@ -1,0 +1,128 @@
+
+void SonicDetectionDia(){
+  Serial.println("op zoek naar Hoogte diabolo");
+  //scan zone 
+  float TotalScanAmount = 0 ; 
+  int K;
+  
+  StepperHead.move(calculateDistanceSteps(-20)); // distance subject to change 
+  for(K = 0 ; K == 20 ;K++){
+    sonic();
+    TotalScanAmount = +SonicDistance;
+    calculateSDelay(calculateDistanceSteps(2), StepperHeadRPM);
+  }
+   TotalAverage = TotalScanAmount/K; 
+  //lezing sensor 
+  StepperHead.move(-calculateDistanceSteps(20));
+  // float average berekenen 
+}
+
+
+
+
+begin(){
+    int unknown = 0;
+int i;
+int loop;
+// hij moet gaan draaien totdat hij iets vind het eerste wat hij doet het opstarten hij doet dit ook maar een keer
+// beweeg grijparm naar het midden toe
+
+for(unknown = 0 ; unknown == 0 ; i++){
+
+StepperBase.move(calculateSteps(zone[i], zone[i+1]));
+calculateSDelay(9, StepperBaseRPM);                     //bereken delay 
+
+sonic();      //hij update de lengte waneer hij in positie is als er iets onder is  
+delay(20);
+Serial.println("hij is aan het zoeken naar de 1e diabol");
+
+//eerst moet hij iets zien vanaf hier dit is stapt 1 en waneer hij iets ziet daaarna gaat hij pas identificeeren of hij ligt of staat 
+
+//trek conclusie uit waarde is dit de pos van de L of H diabol
+// hier kijkt hij eerst of er eigelijk wel iets onder ligt daarna gaat hij aps kijken of het iets anders.
+if(SonicDistance > 16){
+//meet de diabolo op
+SonicDetectionDia();
+  if ((TotalAverage >= 1 ) && (TotalAverage <= 10)){
+    PDiabolH = zone[i];
+    unknown = 1;
+    Serial.println("de 1e diabolo is H");
+// hier steld hij de ene array aan de andere
+    for(loop = 0; loop < 5; loop++) {
+      HdiabolD[loop] = CW[loop];
+    } 
+  }
+  if ((TotalAverage >= 1 ) && (TotalAverage <= 10)){
+    PDiabolL = zone[i];
+    unknown = 1;
+    Serial.println("de 1e diabolo is L");
+    // hier steld hij de ene array aan de andere
+    for(loop = 0; loop < 5; loop++) {
+      LdiabolD[loop] = CW[loop];
+    }
+  }
+}
+}
+
+//zoeken naar de 2e diabol
+Serial.println("hij gaat nu de 2e diabol zoeken");
+// niet i resetten
+//we l below false zetten
+
+for(unknown = 1 ; unknown == 1; i++){
+
+StepperBase.move(calculateSteps(zone[i], zone[i+1]));
+delay(calculateSDelay(8, StepperBaseRPM));                  //bereken delay 
+
+sonic();      // hij update de lengte als er iets onder is 
+delay(20);
+Serial.println("hij is aan het zoeken naar de 2e diabol");
+
+if(SonicDistance > 16){
+SonicDetectionDia();
+//trek conclusie uit waarde is dit de pos van de L of H diabol
+  if ((TotalAverage >= 1 ) && (TotalAverage <= 10)){
+    PDiabolH = zone[i];
+    unknown = 2;
+    Serial.println("de 2e diabolo is H");
+    // hier steld hij de ene array aan de andere
+    for(loop = 0; loop < 5; loop++) {
+      HdiabolD[loop] = CCW[loop];
+    }
+    
+  }
+  if ((TotalAverage >= 1 ) && (TotalAverage <= 10)){
+    PDiabolL = zone[i];
+    unknown = 2;
+    Serial.println("de 2e diabolo is L");
+    // hier steld hij de ene array aan de andere
+    for(loop = 0; loop < 5; loop++) {
+      LdiabolD[loop] = CCW[loop];
+    }
+  }
+}
+}
+// hij heeft nu beide diabolo's gevonden
+EndPos = i;
+
+// de afstand moet er nog in geprogrameerd worden en is nu hard coded dit kan opgelost worden met een gripper die het hele vak over komt
+// hij gaat naar voren toe 
+SwitchHead();
+
+// hij moet nu naar beneden
+SwitchEnd();
+
+// kijken hoe ver hij ligt ? moet dit of maken wij de grijparm groot genoeg dat het niks uit maakt 
+// we gaan er van uit dat de gripper in een open positie is 
+
+// hij moet dichtgaan // kijkt dus ook of hij te maken heeft met low en high
+SwitchGripper();     
+
+// hij moet naar boven
+SwitchEnd();
+
+// hij gaat naar de kern
+SwitchHead();
+
+// dit is het einde van de verzamel en registreer fase
+}
