@@ -317,7 +317,7 @@ int duration;
   duration = pulseIn(EchoPinS1, HIGH);
   SonicDistanceS1 = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
-  Serial.println(SonicDistanceS3);
+  Serial.println(SonicDistanceS1);
 
 delay(5);
 
@@ -333,7 +333,7 @@ delay(5);
   duration = pulseIn(EchoPinS2, HIGH);
   SonicDistanceS2  = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
-  Serial.println(SonicDistanceS3);
+  Serial.println(SonicDistanceS2);
 delay(5);
 
 // sensor 3 lezing
