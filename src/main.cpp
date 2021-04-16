@@ -10,15 +10,17 @@
 // afstand tot de grond voor het bereken van de werkelijk hoogte omgedraait 
 #define distancetoground 10
 
+#define TrigPinS1 14  
+#define TrigPinS2 14 
+#define TrigPinS3 14 
 
-
-#define TrigPin 14  //sonics sensor pins defined at random, Need changing when testing!!
-#define EchoPin 15
-
+#define EchoPinS1 15
+#define EchoPinS2 15
+#define EchoPinS3 15
 //example : BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
 
 
-// de end stepper 
+// de end stepper
 Stepper StepperEnd = Stepper(200, 100, 100, 900, 1100);
 Stepper StepperBase = Stepper(200,8 ,9 ,10 ,11 );
 Stepper StepperHead = Stepper(200,6 ,7 ,8 ,9 );
@@ -183,6 +185,7 @@ void SwitchEnd(){
       EndS = 1 ; 
     }
   }
+
   // if state diabolo is H 
   // hoe laag moet de grijper zakken 
   // else hoe laag moet de grijper zakken voor de diabolo L
@@ -214,56 +217,120 @@ else{
 ////////////////////////////////////////////////////////////////////////////////////////////
 // sensor funties
 
-// af 
-void ReadSensorForward(){
-
-
-
+// nog niet af 
+int HighLowScan(){
   // de functie voor het bepaalen of hij ligt op staat 
   int duration;
+  // 1 is h 0 is l
+  int Position = 1;
+
+
 // lees sonic sensor
-StepperHead.step(-40);
-for(int i = 0; i < 40; i++){
+  StepperHead.step(-40);
+  for(int i = 0; i < 40; i++){
   //delay om in positie te komen kan nog verandert worden
   delay(10);
 
   // Clears the trigPin condition        //kan er meschien uit 
-  digitalWrite(TrigPin, LOW);
+  digitalWrite(TrigPinS2, LOW);
   delayMicroseconds(2);
   // Sets de trigPin HIGH (ACTIVE) voor 10 microseconds
-  digitalWrite(TrigPin, HIGH);
+  digitalWrite(TrigPinS2, HIGH);
   delayMicroseconds(10);
-  digitalWrite(TrigPin, LOW);
-  duration = pulseIn(EchoPin, HIGH);
+  digitalWrite(TrigPinS2, LOW);
+  duration = pulseIn(EchoPinS2, HIGH);
   SensorReading[i]  = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
   StepperHead.step(2);
   // je hebt nu een array
   StepperHead.step(-40);
+ 
+ 
+  Serial.println(SensorReading[i]);
   Serial.println("hij is weer terug in de center nadat hij heeft gescanned");
 }
+// hij moet nu een conclusie gaan trekken uit de sensor array 
+// eerst meot hij de sensor array aflopen en kijken wat de eerste is die 
+// de grens overschreid
+
+for(int i = 0; i<40; i++){
+
+
+if (SensorReading[i] > 0){
+
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+return(Position);
 }
 
 
 // nog niet af 
 void PingSensors(){
+int duration;
+// sensor 1 lezing 
+// Clears the trigPin condition        //kan er meschien uit 
+  digitalWrite(TrigPinS1, LOW);
+  delayMicroseconds(2);
+  // Sets de trigPin HIGH (ACTIVE) voor 10 microseconds
+  digitalWrite(TrigPinS1, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TrigPinS1, LOW);
+  duration = pulseIn(EchoPinS1, HIGH);
+  SonicDistanceS1 = duration * 0.034 / 2;   // rekent afstand in cm
+  // 2 stappen vooruit weer 
+
+
+
+
+// sensor 2 lezing
+// Clears the trigPin condition        //kan er meschien uit 
+  digitalWrite(TrigPinS2, LOW);
+  delayMicroseconds(2);
+  // Sets de trigPin HIGH (ACTIVE) voor 10 microseconds
+  digitalWrite(TrigPinS2, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TrigPinS2, LOW);
+  duration = pulseIn(EchoPinS2, HIGH);
+  SonicDistanceS2  = duration * 0.034 / 2;   // rekent afstand in cm
+  // 2 stappen vooruit weer 
+
+
+// sensor 3 lezing
+// Clears the trigPin condition        //kan er meschien uit 
+  digitalWrite(TrigPinS3, LOW);
+  delayMicroseconds(2);
+  // Sets de trigPin HIGH (ACTIVE) voor 10 microseconds
+  digitalWrite(TrigPinS3, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TrigPinS3, LOW);
+  duration = pulseIn(EchoPinS3, HIGH);
+  SonicDistanceS3 = duration * 0.034 / 2;   // rekent afstand in cm
+  // 2 stappen vooruit weer 
+
 // hier mot hij een pint uitstuuren en daaruit 3 outputs hebben en kijken wat de afstand is tot de sensor 
 SonicDistanceS3 = abs(SonicDistanceS3 - distancetoground);
 SonicDistanceS2 = abs(SonicDistanceS2 - distancetoground);
 SonicDistanceS1 = abs(SonicDistanceS2 - distancetoground);
+
 }
 
 
-// nog niet af
-int HighLowScan(){
-// 1 is h 0 is l
-//int Position;
-
-// hier moet hij de strategie toepassen zoals op het whiteboard zie fotos op whatsapp
 
 
-//return (Position);
-}
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //safety functions
 void EndTimer(){
@@ -296,8 +363,10 @@ int unknown = 2; // hij heeft dus nog geen van beide gevonden
 // het gemiddelde nodig om te berekenen of een van de 3 sensors iets ziet 
 int averagesensor;
 int loop;
-int i;
+int i, S;
 
+
+// i is hierbij de hoeveelheid vakjes 
 for(i = 0 ; unknown == 2; i++){
 
 PingSensors();
@@ -308,8 +377,8 @@ averagesensor = SonicDistanceS1 + SonicDistanceS2 + SonicDistanceS3;
 if (averagesensor > 0){
   unknown++;
   Serial.println("hij heeft de eerste Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
-
-  if(HighLowScan() == 1){
+S = HighLowScan();
+if(S == 1){
 Serial.println("de 1e diabol is Hoog");
 // hij moet nu de array overschrijven 
     for(loop = 0; loop < 5; loop++) {
@@ -319,7 +388,7 @@ Serial.println("de 1e diabol is Hoog");
       PDiabolH = zone[i];
     }
   } 
-  if(HighLowScan() == 0){
+  if(S == 0){
 Serial.println("de 1e diabol is Laag");
 // hij moet nu de array voor de stappen overschrijven
 for(loop = 0; loop < 5; loop++) {
@@ -342,13 +411,16 @@ Serial.println("hij gaat nu zoeken naar de 2e diabol");
 
 for(i = 0 ; unknown == 1; i++){
 PingSensors();
+
 // berekent of een iets ziet door ze gewoon bij elkaar op te tellen wel gevoelig voor foute lezingen
 averagesensor = SonicDistanceS1 + SonicDistanceS2 + SonicDistanceS3;
 if (averagesensor > 0){
+  // hij ziet iets en gaat nu de scan functie uitvoeren
+  S = HighLowScan();
   unknown++;
   Serial.println("hij heeft de eerste Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
 
-  if(HighLowScan() == 1){
+  if(S == 1){
 Serial.println("de 2e diabol is Hoog");
 // hij moet nu de array overschrijven 
     for(loop = 0; loop < 5; loop++) {
@@ -359,7 +431,7 @@ Serial.println("de 2e diabol is Hoog");
       PDiabolH = zone[i];
     }
   } 
-  if(HighLowScan() == 0){
+  if(S == 0){
 Serial.println("de 2e diabol is Laag");
 // hij moet nu de array voor de stappen overschrijven
 for(loop = 0; loop < 5; loop++) {
@@ -373,11 +445,6 @@ for(loop = 0; loop < 5; loop++) {
 Serial.println("hij heeft niks gevonden in de vak gaat naar de volgende ");
 StepperBase.step(calculateSteps(zone[i], zone[i+1]));
 }
-
-
-
-
-
 
 }
 
@@ -479,8 +546,13 @@ void setup() {
   StepperEnd.setSpeed(StepperEndRPM);
   //pinmode aangeven
 
-  pinMode(TrigPin, OUTPUT);
-  pinMode(EchoPin, INPUT);
+  pinMode(TrigPinS1, OUTPUT);
+  pinMode(EchoPinS1, INPUT);
+  pinMode(TrigPinS2, OUTPUT);
+  pinMode(EchoPinS2, INPUT);
+  pinMode(TrigPinS3, OUTPUT);
+  pinMode(EchoPinS3, INPUT);
+
 
 
 // servo aan pin 10 koppelen
@@ -494,18 +566,15 @@ void setup() {
 
 void loop() {
 
-// voor testredenen doen we statediabol h aanhoudoen en de headS is 1
 
-
-//SwitchEnd();
-//SwitchHead();
+SwitchHead();
+SwitchEnd();
 StepperBase.step(200);
-delay(2000);
+delay(5000);
 
-
-
-
-
-
+SwitchHead();
+SwitchEnd();
+StepperBase.step(-200);
+delay(5000);
 
 }
