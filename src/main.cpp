@@ -317,8 +317,9 @@ int duration;
   duration = pulseIn(EchoPinS1, HIGH);
   SonicDistanceS1 = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
+  Serial.println(SonicDistanceS3);
 
-
+delay(5);
 
 
 // sensor 2 lezing
@@ -332,7 +333,8 @@ int duration;
   duration = pulseIn(EchoPinS2, HIGH);
   SonicDistanceS2  = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
-
+  Serial.println(SonicDistanceS3);
+delay(5);
 
 // sensor 3 lezing
 // Clears the trigPin condition        //kan er meschien uit 
@@ -345,7 +347,9 @@ int duration;
   duration = pulseIn(EchoPinS3, HIGH);
   SonicDistanceS3 = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
+  Serial.println(SonicDistanceS3);
 
+delay(5);
 // hier mot hij een pint uitstuuren en daaruit 3 outputs hebben en kijken wat de afstand is tot de sensor 
 SonicDistanceS3 = abs(SonicDistanceS3 - distancetoground);
 SonicDistanceS2 = abs(SonicDistanceS2 - distancetoground);
@@ -404,7 +408,12 @@ delay(2000);
 }
 
 void Begin(){
-  SwitchGripper();
+  // de gripper open zetten
+  Gripper.write(180);
+  GripperS = 1;
+
+
+
   StepperBase.step(40);
 //eerste functie hij gaat ronddeaaien dit is een verzameling van meerdere functies uiteindelijk
 int unknown = 2; // hij heeft dus nog geen van beide gevonden
