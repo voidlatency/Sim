@@ -317,9 +317,11 @@ int duration;
   duration = pulseIn(EchoPinS1, HIGH);
   SonicDistanceS1 = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
+  Serial.println("1e sensor waarde:");
   Serial.println(SonicDistanceS1);
 
-delay(5);
+
+delay(20);
 
 
 // sensor 2 lezing
@@ -333,8 +335,9 @@ delay(5);
   duration = pulseIn(EchoPinS2, HIGH);
   SonicDistanceS2  = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
+  Serial.println("2e sensor waarde:");
   Serial.println(SonicDistanceS2);
-delay(5);
+delay(20);
 
 // sensor 3 lezing
 // Clears the trigPin condition        //kan er meschien uit 
@@ -347,13 +350,14 @@ delay(5);
   duration = pulseIn(EchoPinS3, HIGH);
   SonicDistanceS3 = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
+  Serial.println("3e sensor waarde:");
   Serial.println(SonicDistanceS3);
 
-delay(5);
+delay(20);
 // hier mot hij een pint uitstuuren en daaruit 3 outputs hebben en kijken wat de afstand is tot de sensor 
-SonicDistanceS3 = abs(SonicDistanceS3 - distancetoground);
-SonicDistanceS2 = abs(SonicDistanceS2 - distancetoground);
-SonicDistanceS1 = abs(SonicDistanceS2 - distancetoground);
+SonicDistanceS3 = SonicDistanceS3 - distancetoground);
+SonicDistanceS2 = SonicDistanceS2 - distancetoground);
+SonicDistanceS1 = SonicDistanceS2 - distancetoground);
 
 }
 
