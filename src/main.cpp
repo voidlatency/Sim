@@ -205,6 +205,16 @@ void SwitchGripper(){
 // weer een check als hij open staat dicht doen als hij dicht is open doen 
 // code voor het naar het midden gaan van de Head stepper of naar buiten afhankelijk van de huidige positie
 // 0 is dicht 1 is open
+
+
+
+// hij moet ook ng kijken in wat voor stat hij zit 
+// hiervoor zijn er dus 3 eigelijk helemaal open dicht l en dicht h 
+
+
+
+
+// dit moet er ook nog ingeprogrameerd worden 
 if (GripperS == 0){ // hij is dicht dus nu open
 Gripper.write(180);
 GripperS = 1;
@@ -292,6 +302,7 @@ Position = 1;
 else{
   Serial.println("error diabol h/l onbekent");
 }
+StepperBase.step(-40);
 return(Position);
 }
 
@@ -398,6 +409,7 @@ delay(2000);
 }
 
 void Begin(){
+  SwitchGripper();
   StepperBase.step(40);
 //eerste functie hij gaat ronddeaaien dit is een verzameling van meerdere functies uiteindelijk
 int unknown = 2; // hij heeft dus nog geen van beide gevonden
@@ -494,7 +506,7 @@ StepperBase.step(calculateSteps(zone[i+1]));
 }
 Serial.println("hij heeft beide diabolen gevonden en geindiceerd welke kant hij op moet draaien");
 
-Stepperbase.step(-40);
+StepperBase.step(-40);
 // is dit het eind deel van begin ?
 // posities van de diabolen zijn al bekent nu en of ze hoog en laag zijn
 // de begin game state is ook al bepaald 
