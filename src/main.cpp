@@ -45,7 +45,6 @@ int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125
 // met de klok mee of er tegen in
 int CW[5] = {41, 58, 142, 158, 191};   //clockwise
 int CCW[5] = { 142, 158, 41, 58, 83};  //counterclockwise
-int GDirection[5];                     // de huidige volgorde van het spel
 // de laaste is rust positie 
 // 0 is rust positie van de diabolo
 
@@ -71,11 +70,10 @@ int BasePos; // de basis waar hij op dit moment zich bevind
 int PDiabolH;
 int PDiabolL;
 
-
 // geeft de state van die machine aan 
 int StateDiabolL;
 int StateDiabolH;
-/////////
+
 // 0 is dicht 1 is open
 int GripperS = 0;
 //head 0 is center 
@@ -88,14 +86,8 @@ int EndS = 0;
 //klok die op de achtergrond de tijd bijhoud
 unsigned long Clock;
 
-
-/////////sensor integers
-//sensor array
-
+// sensor array
 float SensorReading[40];
-
-
-
 
 int tijdverlopen; 
 
@@ -105,7 +97,11 @@ float SonicDistanceS2;
 float SonicDistanceS3; 
 
 
+
 float TotalAverage; 
+
+
+
 
 bool Diabololaying;  
 bool Diabolostanding;
@@ -220,9 +216,8 @@ Gripper.write(180);
 GripperS = 1;
 }
 if (GripperS == 1){ // is open dus nu dicht 
-Gripper.write(0);
+Gripper.write(90);
 GripperS = 0;
-
 }
 else{
   Serial.println("error");
@@ -756,8 +751,8 @@ void setup(){
   pinMode(TrigPinS3, OUTPUT);
   pinMode(EchoPinS3, INPUT);
 
-// servo aan pin 10 koppelen
-  Gripper.attach(80);
+// servo aan pin 13 koppelen
+  Gripper.attach(13);
 
 
   // de begin functie een van de grootste functies 
@@ -775,7 +770,7 @@ void loop() {
 MaingameS();
 // en hij moet ook nog na 5 min kijken of deze voorbij zijn maar deze funcie is een van de velen die gecshrapt is voor nu .
 Serial.println("ik heb 4 punten verzameld naar de volgende toe ");
-
+delay(2000);
 
 
 }
