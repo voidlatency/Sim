@@ -565,8 +565,6 @@ void setup() {
 
 
 void loop() {
-
-
 SwitchHead();
 SwitchEnd();
 StepperBase.step(200);
@@ -578,3 +576,6 @@ StepperBase.step(-200);
 delay(5000);
 
 }
+
+
+// het is justin zijn schult als dit niet werkt
