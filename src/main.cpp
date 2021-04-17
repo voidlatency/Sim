@@ -10,7 +10,6 @@
 // afstand tot de grond voor het bereken van de werkelijk hoogte omgedraait 
 #define distancetoground 10
 
-
 // pins voor de sensoren
 #define TrigPinS1 43  
 #define TrigPinS2 47 
@@ -283,6 +282,9 @@ veder is het nog efficenter te maken door de average te gaan berekenen vanaf de 
 ook zorgt dit er voor dat je meer ziet wat er gebeurt. dit stuk moet dus voor sim 3 helemaal anders geprogrameerd worden. vergeet daarbij ook niet aan dat je moet onthouden wanneer de eerste avverag er is een van de beste manier is om een nieuwe 
 array aan te maken voor de waardes boven 10 en hieruit veder te rekenen dus alles hierboven en onder veranderen tot een functie die een neiuwe array aanmaakt en hier uit de average rekent en onthoud bij welke step de eerste waarde kleiner is dan 10
 
+
+
+
 veel suc6 !  hehe
 */
 
@@ -310,7 +312,7 @@ else{
   Serial.println("error diabol h/l onbekent");
 }
 StepperBase.step(-40);
-return(Position);
+return(Position); // hier geeft hij dus door of hij H of L positie is 
 }
 
 
@@ -373,10 +375,10 @@ SonicDistanceS1 = distancetoground - SonicDistanceS1;
 
 
 
-Serial.print("de uiteindelijk afstand tot de grond is op volgorde 1,2,3 is:");
-Serial.print(SonicDistanceS1);
-Serial.print(SonicDistanceS2);
-Serial.print(SonicDistanceS3);
+Serial.println("de uiteindelijk afstand tot de grond is op volgorde 1,2,3 is:");
+Serial.println(SonicDistanceS1);
+Serial.println(SonicDistanceS2);
+Serial.println(SonicDistanceS3);
  // voobeeld hij ziet 6 doet hij dus 10 - 5 is 4 betekend dat er iets op een hoogte van 4 staat weet niet of dit een heel handige manier is om het te berekenen
 }
 
@@ -409,12 +411,10 @@ else{
 ////////////////////////////////////////////////////////////////////////////////////////////
 //game functions
 
-/*een van de blangerijskte functies moeten heel veel testen of dit wel werkt en of we bepaalde dingen over het hoofd hebben gezien 
-mijn vermoeden is ook dat er iets fout gaat bij het uilezen van de sensor omdat hij dit maar een keer odet waneer hij over een vlak heen gaat*/
-
+// hij moet de diabol neerzetten voor een paar seconde en dan weer oppakken en naar zijn rust positie gaan dit kan ook getest worden los 
 
 void gatherpoint(){
-// hij moet naar voren toe en weer te
+
 // delays kunne nog aangepast worden 
 
 
@@ -497,6 +497,10 @@ for(loop = 0; loop < 5; loop++) {
 
 // kijk of alles hierboven wel nodig is als er geen onderscheid hoeft gemaakt te worden met of het een hooge of laage diabol is. 
 
+
+
+// bij sim 3 moet hier ook nog in gezet worden dat hi jde 1e diabol in het midden legt of maak het nog complexer dat naast h en laag en de positie ook onthouden word wat de afstand is dit is niet heel moeilijk als je nog een variable aanmaakt
+// hier mogen jullie lekker naar kijken de volgende keer!
 
 Serial.println("hij heeft niks gevonden in de vak gaat naar de volgende ");
 StepperBase.step(calculateSteps(zone[i+1]));
