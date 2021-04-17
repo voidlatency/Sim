@@ -19,10 +19,9 @@
 #define EchoPinS1 45
 #define EchoPinS2 49
 #define EchoPinS3 53
+
+
 //example : BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
-
-
-
 #define EndDelay 1000
 #define HeadDelay 1000
 #define GripperDelay 1000
@@ -43,8 +42,8 @@ int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125
 
 
 // met de klok mee of er tegen in
-int CW[5] = {41, 58, 142, 158, 191};   //clockwise
-int CCW[5] = { 142, 158, 41, 58, 83};  //counterclockwise
+int CW[5] = {41, 58, 142, 158, 191} ;  //clockwise
+int CCW[5] = { 142, 158, 41, 58, 83} ; //counterclockwise
 // de laaste is rust positie 
 // 0 is rust positie van de diabolo
 
@@ -58,13 +57,11 @@ int LdiabolD[5];     // de richting van L diabol
 Servo Gripper;
 
 //laatste position is 0 aan het begin
-int EndPos = zone[1];
 int StartPos; //is de positie nadat hij de diabolo's heeft gevonden en hij start met het spel
 int StartVlak;   // welke hij van de 4 belangerijke vakken als eerst heeft gekozen om het spel mee te beginnen
 int Steps;
 float SDelay;  //delay voor tussen de steppen
-int STlocation; // memory slot van de stepdistancefunctie voor later gebruik 
-int BasePos; // de basis waar hij op dit moment zich bevind 
+int BasePos = zone[1];; // de basis waar hij op dit moment zich bevind 
 
 //geven de posities van de diabolen aan
 int PDiabolH;
@@ -97,10 +94,7 @@ float SonicDistanceS2;
 float SonicDistanceS3; 
 
 
-
 float TotalAverage; 
-
-
 
 
 bool Diabololaying;  
@@ -127,37 +121,39 @@ BasePos = Target;
   return(Steps);
 }
 
+
+//  kan ook iets fout mee gaan 
 float calculateSDelay(int Step, int StepperRPM){
-SDelay = Step/(StepperRPM * 0.006);
+SDelay = abs(Step/(StepperRPM * 0.006));
+
+// voor veiligheid een extra delay als dit nodig blijkt te zijn. 
+// delay(5);
 
 return(SDelay);
 }
 
-int calculateDistanceSteps(int Distance){ // in cm
-   float MmStep = 0.18849;
-   int StepDistance = Distance/MmStep; 
-   STlocation = StepDistance; 
-  return(StepDistance);  
-  
-}
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //position functions
 
+
+// hier gaat ook iets fout
 void SwitchHead(){
  if(HeadS == 0){
+
+
  //head is in base position 
-   StepperHead.step(calculateDistanceSteps(20));
-  calculateSDelay( calculateDistanceSteps(20), StepperHeadRPM);
+   StepperHead.step(40);
+  calculateSDelay(40, StepperHeadRPM);
    HeadS = 1; 
  }
 
 
  if(HeadS == 1){
-   StepperHead.step(-calculateDistanceSteps(20));
-   calculateSDelay(-calculateDistanceSteps(20), StepperHeadRPM);
+   StepperHead.step(-40);
+   calculateSDelay(-40, StepperHeadRPM);
    //head is in middle position 
     HeadS = 0; 
  }
@@ -166,7 +162,10 @@ void SwitchHead(){
 
 
 void SwitchEnd(){
- 
+ // voor dit project is dit meschien niet nodig kijk of hij wel echt naar boven of naar beneden moet 
+
+
+
   if(StateDiabolH == true){
     StepperEnd.step(342);
     EndS = 1;    // gripper is in low positition for high diabolo 
@@ -178,15 +177,19 @@ void SwitchEnd(){
     }
   }
 
-  else{
+  if(StateDiabolL == true){
     StepperEnd.step(343);
-    EndS = 0 ; 
+    EndS = 0 ;   //gripper is in lowposition for low diabolo 
     if(EndS == 0){
        StepperEnd.step(-343);
     }
     else{
       EndS = 1 ; 
     }
+  }
+
+  else{
+    Serial.println("error game state niet gevonden end kan niet switchen");
   }
 
   // if state diabolo is H 
@@ -198,19 +201,9 @@ void SwitchEnd(){
 
 
 void SwitchGripper(){
-// weer een check als hij open staat dicht doen als hij dicht is open doen 
-// code voor het naar het midden gaan van de Head stepper of naar buiten afhankelijk van de huidige positie
 // 0 is dicht 1 is open
-
-
-
-// hij moet ook ng kijken in wat voor stat hij zit 
-// hiervoor zijn er dus 3 eigelijk helemaal open dicht l en dicht h 
-
-
-
-
-// dit moet er ook nog ingeprogrameerd worden 
+// de gripper heeft maar 2 standen open en dicht bij dicht kan hij de diabol in beide zijn posties op pakken
+// hier hoeft dus niet meer voor geprogrameerd te worden. 
 if (GripperS == 0){ // hij is dicht dus nu open
 Gripper.write(180);
 GripperS = 1;
@@ -237,8 +230,10 @@ int HighLowScan(){
   int Position = 1;
 
 
-// lees sonic sensor
+// hij zit nog in het midden op dit moment en moet eerst dus nog 40 stappe nnaarachteren om echt het hele vak af te gaan
   StepperHead.step(-40);
+
+
   for(int i = 0; i < 40; i++){
   //delay om in positie te komen kan nog verandert worden
   delay(10);
@@ -261,36 +256,53 @@ int HighLowScan(){
   Serial.println(SensorReading[i]);
   Serial.println("hij is weer terug in de center nadat hij heeft gescanned");
 }
+
+
 // hij moet nu een conclusie gaan trekken uit de sensor array 
 // eerst meot hij de sensor array aflopen en kijken wat de eerste is die 
 // de grens overschreid en tegelijk hierna moet hij de daibol oppakken en naar het midden zetten als dat niet al is 
 
+
+
+// is geschrapt voor sim2 wel heel nodig voor sim 3 !
+
 /*for(int i = 0; i<40; i++){
 if (SensorReading[i] > 0){
-   
+
 }
 }
 voor later meot hier de code staan voor het oppakken en dan in het midden setten van de diabol en het 
 berekenen waar de daibol nou precies ligt in opzichte van het middelpunt van de circel
 
 *vraag boyd voor vedere uitleg hierover*
+
+
+
+
+veder is het nog efficenter te maken door de average te gaan berekenen vanaf de eerste array waarde die kleiner is dan 10 dit zorgt ervoor dat je een nettere average krijgt zonder heel veel nullen er in
+ook zorgt dit er voor dat je meer ziet wat er gebeurt. dit stuk moet dus voor sim 3 helemaal anders geprogrameerd worden. vergeet daarbij ook niet aan dat je moet onthouden wanneer de eerste avverag er is een van de beste manier is om een nieuwe 
+array aan te maken voor de waardes boven 10 en hieruit veder te rekenen dus alles hierboven en onder veranderen tot een functie die een neiuwe array aanmaakt en hier uit de average rekent en onthoud bij welke step de eerste waarde kleiner is dan 10
+
+veel suc6 !  hehe
 */
 
 
 
+
 // hier moet hij een conclusie gaan trekken nadat het gemiddelde is bertekend
-int total;
+float total;
 //eerst berekent hij het gemmidelde uit met wat hij heeft 
 for(int i = 0; i < 40; i++){
 total = SensorReading[i] + total;
 }
-int average = total/40;
+float average = total/40;
+
 // hij is nu klaar met het gemmidelde te bereken
-if (average <= 7.9){
+if (average <= 7.9){      // is random getal
 // hij ligt 
 Position = 0;
 }
-if (average >= 8){
+if (average >= 8){        // is random getal
 // hij staat recht op
 Position = 1;
 }
@@ -355,10 +367,17 @@ delay(20);
 
 delay(20);
 // hier mot hij een pint uitstuuren en daaruit 3 outputs hebben en kijken wat de afstand is tot de sensor 
-SonicDistanceS3 = SonicDistanceS3 - distancetoground);
-SonicDistanceS2 = SonicDistanceS2 - distancetoground);
-SonicDistanceS1 = SonicDistanceS2 - distancetoground);
+SonicDistanceS3 = distancetoground - SonicDistanceS3;
+SonicDistanceS2 = distancetoground - SonicDistanceS2;
+SonicDistanceS1 = distancetoground - SonicDistanceS1;
 
+
+
+Serial.print("de uiteindelijk afstand tot de grond is op volgorde 1,2,3 is:");
+Serial.print(SonicDistanceS1);
+Serial.print(SonicDistanceS2);
+Serial.print(SonicDistanceS3);
+ // voobeeld hij ziet 6 doet hij dus 10 - 5 is 4 betekend dat er iets op een hoogte van 4 staat weet niet of dit een heel handige manier is om het te berekenen
 }
 
 
@@ -367,6 +386,7 @@ SonicDistanceS1 = SonicDistanceS2 - distancetoground);
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //safety functions
+/*
 void EndTimer(){
 // kijken of hij de 5 min overschrijd 
 int seconds;  
@@ -382,6 +402,10 @@ else{
 }
 }
 
+
+*/
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 //game functions
 
@@ -391,7 +415,7 @@ mijn vermoeden is ook dat er iets fout gaat bij het uilezen van de sensor omdat 
 
 void gatherpoint(){
 // hij moet naar voren toe en weer te
-
+// delays kunne nog aangepast worden 
 
 
 // gaat dus eerst weer naar vooren toe 
@@ -413,12 +437,19 @@ delay(2000);
 
 void Begin(){
   // de gripper open zetten
+
+  // hij moet hier naar het midden gaan ook eerst. 
+
   Gripper.write(180);
   GripperS = 1;
 
 
+  StepperHead.step(40);
+// onthoud hij denk dat hij nog bij de center is de heads state is 0 maar hij zit wel in midden
 
-  StepperBase.step(40);
+
+
+
 //eerste functie hij gaat ronddeaaien dit is een verzameling van meerdere functies uiteindelijk
 int unknown = 2; // hij heeft dus nog geen van beide gevonden
 //de eerste diabol zoeken en bepaalen of hij licht of staat.
@@ -462,6 +493,9 @@ for(loop = 0; loop < 5; loop++) {
     }
   }
 }
+
+
+// kijk of alles hierboven wel nodig is als er geen onderscheid hoeft gemaakt te worden met of het een hooge of laage diabol is. 
 
 
 Serial.println("hij heeft niks gevonden in de vak gaat naar de volgende ");
@@ -742,15 +776,17 @@ SwitchState();
 //start main code 
 void setup(){
   //start serial met Baudrate
+
+  // hij begint met zijn head in de center en hij moet altijd met zijn gripper bij de 0 positiei worden neer gezet want hier werken de andere functies op 
+  HeadS = 0;
+  
+
+
+
+
+
   Serial.begin(9600);
-
-
- StateDiabolH = 1;
- HeadS = 1;
-
-
-
-
+  
   //example stepper.begin(RPM, MICROSTEPS); Start de steppers
   StepperBase.setSpeed(StepperBaseRPM);
   StepperHead.setSpeed(StepperHeadRPM);
