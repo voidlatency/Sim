@@ -126,3 +126,16 @@ SwitchHead();
 
 // dit is het einde van de verzamel en registreer fase
 }
+
+
+
+
+
+/// nakijken
+int calculateDistanceSteps(int Distance){ // in cm
+   float MmStep = 0.18849;
+   int StepDistance = Distance/MmStep; 
+
+  return(StepDistance);  
+  
+}
