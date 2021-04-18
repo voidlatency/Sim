@@ -1,3 +1,13 @@
+hieronder staan functies die weg gegooid zijn maar meschien nog wel hadnig voor in de toekosmt of voor in het volgende project
+dit zijn vooral safety functie die helemaal zijn verwijdert voor dit project en meschien functie die wij weg moesten gooien door plan verandering.
+
+
+
+
+
+
+
+
 
 void SonicDetectionDia(){
   Serial.println("op zoek naar Hoogte diabolo");

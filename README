@@ -1,0 +1,34 @@
+algemeene zaken waar rekening mee moet worden gehouden en aanwijzingen voor het volgende progrmaeer team
+
+
+
+1.  in de abandoned folder staan functie die er tijdel;ijk uit zijn gehaald maar waaar
+    meschien nog een nut voor is kijk hiernaar voor project 3 want hier staan vooral 
+    safety functies in die handig kunnen zijn voor het volgende project
+
+
+2.  in de main code staan ook nog aanwijzingen wat er gedaan moet worden voor sim 3 wat nog niet gedaan is
+    dit zijn bijvoorbeeld functie die erg nodig zijn en waar wij hebben gefoetelt bij sim 2
+    zoals het herkennen van de diabol op welke hoogte er staat meestal ook gecomment hoe dit gedaan moet worden
+
+
+3. Omdat in sim 2 veel gekloot is met libraries moet er gekeken worden of er niet libraries verwijdert kunnen
+    worden omdat er nu 2 libraries in dit bestand staan die niks doen het zou handig zijn als deze verwijdert kunnen worden
+
+
+4. voor sim 3 moet er gekeken worden of er accelstepper gebruitk kan worden dit in het verband met het versnellen en vertragen
+    van e stepoper motors wat verbruik kan verminderen en levensduur van de motoren kan helpen verbeteren veder zal het helpen met afremmem
+    en daarbij meer presciesie .
+    deze library is wat complexer maar is het wel waard voor het volgende project  kijk hier dus goed naar.
+
+
+5. voor de sensoren word volgende keer aangeraden om lasers te pakken deze kunnen tegelijkertijd werken en zijn veel beter ook hebben deze
+    een rechte lijn en niet een oppervlak waar zij op af kunnen stooten dit brengt dus ook weer andere code met zich mee onthoud dit 
+    voor volgende keer
+
+
+6. in sim 1 is er niet veel gewerkt met functies en is de code een rotzooi dit moet ook opgelost worden bij sim2 is hier wat 
+    meer rekening mee gehouden dus de code van sim 2 moet eerst helemaal worden omgezet naar een werkenede functies. ook was bij sim 2 
+    het stop symbol niet snel ingeprogrameerd en kan de code veel sneller door de delays te verminderen niet te veel 
+    hier modet dus nog meer getest mee worden
+
