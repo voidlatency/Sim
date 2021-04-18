@@ -139,3 +139,30 @@ int calculateDistanceSteps(int Distance){ // in cm
   return(StepDistance);  
   
 }
+
+
+
+
+
+
+
+
+
+// de klok functie 
+
+void EndTimer(){
+// kijken of hij de 5 min overschrijd 
+int seconds;  
+int totaltime = 300; 
+
+seconds = Clock/ 1000; 
+
+if(seconds == totaltime){
+  tijdverlopen = 1 ;
+}
+else{
+  tijdverlopen = 0 ;
+}
+}
+
+

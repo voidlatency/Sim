@@ -19,7 +19,6 @@
 #define EchoPinS2 49
 #define EchoPinS3 53
 
-
 //example : BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
 #define EndDelay 1000
 #define HeadDelay 1000
@@ -29,8 +28,10 @@
 Stepper StepperEnd = Stepper(200, 2, 3, 4, 5);
 Stepper StepperBase = Stepper(200,8 ,9 ,10 ,11 );
 Stepper StepperHead = Stepper(200, 25, 27 , 29, 31);
-//
 
+//servo
+Servo Gripper;
+#define Gripperpin 13
 //zet zones op en geeft deze waardes op opgeroepen te worden zie foto verdeling voor veder uitleg
 int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125, 133, 142, 150, 158, 166, 175, 183, 191};
 // belangerijke zones
@@ -52,13 +53,8 @@ int LdiabolD[5];     // de richting van L diabol
 // 1 is met klok mee 0 is tegen de klok in 
 
 
-//servo
-Servo Gripper;
 
-//laatste position is 0 aan het begin
-int StartPos; //is de positie nadat hij de diabolo's heeft gevonden en hij start met het spel
-int StartVlak;   // welke hij van de 4 belangerijke vakken als eerst heeft gekozen om het spel mee te beginnen
-int Steps;
+
 float SDelay;  //delay voor tussen de steppen
 int BasePos = zone[1];; // de basis waar hij op dit moment zich bevind 
 
@@ -77,10 +73,6 @@ int HeadS = 0;
 
 //endS 0 is dicht
 int EndS = 0;
-
-
-//klok die op de achtergrond de tijd bijhoud
-unsigned long Clock;
 
 // sensor array
 float SensorReading[40];
@@ -104,7 +96,10 @@ bool Diabolostanding;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // calculation functions
 int calculateSteps(int Target){
+
+
 //berekening stappen
+int Steps;
 int End1 = BasePos;
 int End2 = BasePos + 200;      // 2e variant van dezelfde position
 int StepOption1 = Target - End1;
@@ -250,7 +245,7 @@ int HighLowScan(){
   StepperHead.step(2);
   // je hebt nu een array
   StepperHead.step(-40);
- 
+ // test voor laag en hoog door te printen wat de average is voor een paar keer totdat met trial en error de average vast staan en kijk wat de marigin is als het goed is is het elke keer ongeveer dezelfde waarde 
  
   Serial.println(SensorReading[i]);
   Serial.println("hij is weer terug in de center nadat hij heeft gescanned");
@@ -388,24 +383,36 @@ Serial.println(SonicDistanceS3);
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //safety functions
-/*
-void EndTimer(){
-// kijken of hij de 5 min overschrijd 
-int seconds;  
-int totaltime = 300; 
 
-seconds = Clock/ 1000; 
-
-if(seconds == totaltime){
-  tijdverlopen = 1 ;
-}
-else{
-  tijdverlopen = 0 ;
-}
-}
+// bijna alle safety functies zijn geschrapt omdat er geen tijd meer was
 
 
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -415,38 +422,37 @@ else{
 
 void gatherpoint(){
 
-// delays kunne nog aangepast worden 
-
 
 // gaat dus eerst weer naar vooren toe 
 SwitchHead();
 delay(1000);
+
 // de afstad naar beneden word al bepaald in de functie van switchend 
 SwitchEnd();
 delay(1000);
-// daarna doet hij de servo draaien en doet hij de gripper dicht vergeet niet in het begin om de gripper altijd open te hebben
+
+// nu doet hij de servo open en na 2 seconde doet hij hem weer dicht om de diabol weer op te pakken 
 SwitchGripper();
 delay(1000);
 SwitchGripper();
 
-//daarna alles weer in spiegelbeeld om weer terug in zijn center te komen 
+// nu moet hij weer omhoog en naar zijn hart toe it doet hij tegelijk en heeft hij 2 seconde voor 
 SwitchEnd();
 SwitchHead();
 delay(2000);
 }
 
 void Begin(){
-  // de gripper open zetten
+// pas op omdat de safety feature weg is betekend dat de machine onverwachte dingen kan doen wanneer er een diabol op vak 0 ligt dit is op te lossen met een functie later maar let hier bij op
 
-  // hij moet hier naar het midden gaan ook eerst. 
 
+  // de gripper open zetten omdat hij nog niks te pakken heeft in het begin 
   Gripper.write(180);
   GripperS = 1;
 
-
   StepperHead.step(40);
-// onthoud hij denk dat hij nog bij de center is de heads state is 0 maar hij zit wel in midden
-
+  // onthoud hij denk dat hij nog bij de center is de heads state is 0 maar hij zit wel in midden
+  // kijken of dit wel handig is want het midden is al switch maar dit kan voor nu worden genegeerd kijk of dit bij sim 3 van toepassing is
 
 
 
@@ -463,7 +469,13 @@ int i, S;
 // i is hierbij de hoeveelheid vakjes 
 for(i = 0 ; unknown == 2; i++){
 
-PingSensors();
+  //eerst draait hij naar het volgende vak
+  Serial.println("hij heeft niks gevonden in de vak gaat naar de volgende ");
+  StepperBase.step(calculateSteps(zone[i+1]));
+  delay(1000);
+
+// nadat hij naar zijn vak heeft gedraait scant hij
+  PingSensors();
 
 
 // berekent of een iets ziet door ze gewoon bij elkaar op te tellen wel gevoelig voor foute lezingen
@@ -495,22 +507,27 @@ for(loop = 0; loop < 5; loop++) {
 }
 
 
-// kijk of alles hierboven wel nodig is als er geen onderscheid hoeft gemaakt te worden met of het een hooge of laage diabol is. 
-
-
 
 // bij sim 3 moet hier ook nog in gezet worden dat hi jde 1e diabol in het midden legt of maak het nog complexer dat naast h en laag en de positie ook onthouden word wat de afstand is dit is niet heel moeilijk als je nog een variable aanmaakt
 // hier mogen jullie lekker naar kijken de volgende keer!
 
-Serial.println("hij heeft niks gevonden in de vak gaat naar de volgende ");
-StepperBase.step(calculateSteps(zone[i+1]));
+
 }
-/////////
-Serial.println("hij gaat nu zoeken naar de 2e diabol");
 
 
+Serial.println("ik gaat nu zoeken naar de 2e diabol");
 
+
+// hij gaat veder met de stappen die hij al had gedaan
 for(; unknown == 1; i++){
+
+// hij gaat eerst naar het volgende vak toe dit voorkomt ook dat hij 2x een diabol scant 
+Serial.println("ik heb niks gevonden in het vak gaat naar de volgende ");
+
+StepperBase.step(calculateSteps(zone[i+1]));
+delay(1000);
+
+
 PingSensors();
 
 // berekent of een iets ziet door ze gewoon bij elkaar op te tellen wel gevoelig voor foute lezingen
@@ -519,7 +536,7 @@ if (averagesensor > 0){
   // hij ziet iets en gaat nu de scan functie uitvoeren
   S = HighLowScan();
   unknown++;
-  Serial.println("hij heeft de eerste Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
+  Serial.println("ik heb de tweede Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
 
   if(S == 1){
 Serial.println("de 2e diabol is Hoog");
@@ -547,8 +564,7 @@ for(loop = 0; loop < 5; loop++) {
     }
   }
 }
-Serial.println("hij heeft niks gevonden in de vak gaat naar de volgende ");
-StepperBase.step(calculateSteps(zone[i+1]));
+
 }
 Serial.println("hij heeft beide diabolen gevonden en geindiceerd welke kant hij op moet draaien");
 
@@ -610,145 +626,145 @@ void MaingameS(){
 // vooraf conclusie om het makkelijker te maken voor kopieeren en plakken
 // hij is nu bezig met het laage diabol
 if (StateDiabolL == 1){
-// hij moet eerst naar de l diabol toe 
-StepperBase.step(calculateSteps(PDiabolL));
-calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
-// hij hangt nu boven de liggende diabol
-Serial.println("ik hang nu boven de liggende diabol ik ga nu beginnen met mijn game strategie");
+    // hij moet eerst naar de l diabol toe 
+    StepperBase.step(calculateSteps(PDiabolL));
+    calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
+    // hij hangt nu boven de liggende diabol
+    Serial.println("ik hang nu boven de liggende diabol ik ga nu beginnen met mijn game strategie");
 
 
-// hij gaat nu naar voren toe 
-SwitchHead();
-delay(HeadDelay);
-// hij doet nu zijn gripper open 
-SwitchGripper();
-delay(GripperDelay);
-// hij gaat nu naar beneden
-SwitchEnd();
-delay(EndDelay);
-// hij gaat nu de diabol pakken
-SwitchGripper();
-delay(GripperDelay);
-// hij moet nu weer naar boven en naar zijn hart toe 
-SwitchEnd();
-SwitchHead();
-delay(HeadDelay);
+    // hij gaat nu naar voren toe 
+    SwitchHead();
+    delay(HeadDelay);
+    // hij doet nu zijn gripper open 
+    SwitchGripper();
+    delay(GripperDelay);
+    // hij gaat nu naar beneden
+    SwitchEnd();
+    delay(EndDelay);
+    // hij gaat nu de diabol pakken
+    SwitchGripper();
+    delay(GripperDelay);
+    // hij moet nu weer naar boven en naar zijn hart toe 
+    SwitchEnd();
+    SwitchHead();
+    delay(HeadDelay);
 
 
-// vanaf hier heeft hij de daibol in zijn hand
-Serial.println("ik heb L diabol in mijn handen en ben weer terug in mijn hart");
+    // vanaf hier heeft hij de daibol in zijn hand
+    Serial.println("ik heb L diabol in mijn handen en ben weer terug in mijn hart");
 
-int i;
+    int i;
 
-for(i = 0; i < 4; i++){
-  // hij gaat nu naar de volgende toe 
-  StepperHead.step(calculateSteps(LdiabolD[i]));
-  calculateSDelay(calculateSteps(LdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
-  // hij moet nu weer zijn standaart programma draaien door naar voren te gaan open te doen en snel neer ze zetten voor een paar seconde 
-  Serial.println("ik ga nu beginnen met een punt te verzamelen voor de liggende diabol");
-  gatherpoint();
-  Serial.println("ik heb net een punt verzamelt veder naar de volgende !"); 
-}
-if (i == 4){
-// L diabol moet nu naar zijn rust positie worden gebracht. dit is in de array de 5e positie 
-  StepperHead.step(calculateSteps(LdiabolD[i]));
-  calculateSDelay(calculateSteps(LdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+    for(i = 0; i < 4; i++){
+      // hij gaat nu naar de volgende toe 
+      StepperHead.step(calculateSteps(LdiabolD[i]));
+      calculateSDelay(calculateSteps(LdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+      // hij moet nu weer zijn standaart programma draaien door naar voren te gaan open te doen en snel neer ze zetten voor een paar seconde 
+      Serial.println("ik ga nu beginnen met een punt te verzamelen voor de liggende diabol");
+      gatherpoint();
+      Serial.println("ik heb net een punt verzamelt veder naar de volgende !"); 
+    }
+    if (i == 4){
+    // L diabol moet nu naar zijn rust positie worden gebracht. dit is in de array de 5e positie 
+      StepperHead.step(calculateSteps(LdiabolD[i]));
+      calculateSDelay(calculateSteps(LdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
 
-  SwitchHead();
-  delay(HeadDelay);
-  SwitchEnd();
-  delay(EndDelay);
-  SwitchGripper();
-  SwitchEnd();
-  delay(EndDelay);
-  // hier zorgt hij ervoor dat hij terug naar de kern kan en daarabij ook weer zijn gripper reset 
-  SwitchGripper();
-  SwitchHead();
-  delay(HeadDelay);
-// hij zit nu weer in zijn center na de strategie voor de l diabol te hebben uitgevoert
+      SwitchHead();
+      delay(HeadDelay);
+      SwitchEnd();
+      delay(EndDelay);
+      SwitchGripper();
+      SwitchEnd();
+      delay(EndDelay);
+      // hier zorgt hij ervoor dat hij terug naar de kern kan en daarabij ook weer zijn gripper reset 
+      SwitchGripper();
+      SwitchHead();
+      delay(HeadDelay);
+    // hij zit nu weer in zijn center na de strategie voor de l diabol te hebben uitgevoert
 
-// hij onthoud waar hij de daibol heeft neergezet. eigelijk alleen maar nodig voor de eerste keer.
-PDiabolL = LdiabolD[i];
-
-
-Serial.println("ik ben klaar met puntjes verzamelen yay ! nu op naar de H diabol!");
+    // hij onthoud waar hij de daibol heeft neergezet. eigelijk alleen maar nodig voor de eerste keer.
+    PDiabolL = LdiabolD[i];
 
 
-// en hier schakelt hij weer om naar de volgende state. zodat hij weet wat hij moet doen
-SwitchState();
+    Serial.println("ik ben klaar met puntjes verzamelen yay ! nu op naar de H diabol!");
+
+
+    // en hier schakelt hij weer om naar de volgende state. zodat hij weet wat hij moet doen
+    SwitchState();
 
 
 }
 // hij zit in de H gamestate
 if (StateDiabolH == 1){
-// hij moet eerst naar de H diabol toe 
-StepperBase.step(calculateSteps(PDiabolL));
-calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
-// hij hangt nu boven de liggende diabol
-Serial.println("ik hang nu boven de staande  diabol ik ga nu beginnen met mijn game strategie");
+    // hij moet eerst naar de H diabol toe 
+    StepperBase.step(calculateSteps(PDiabolL));
+    calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
+    // hij hangt nu boven de liggende diabol
+    Serial.println("ik hang nu boven de staande  diabol ik ga nu beginnen met mijn game strategie");
 
 
-// hij gaat nu naar voren toe 
-SwitchHead();
-delay(HeadDelay);
-// hij doet nu zijn gripper open 
-SwitchGripper();
-delay(GripperDelay);
-// hij gaat nu naar beneden
-SwitchEnd();
-delay(EndDelay);
-// hij gaat nu de diabol pakken
-SwitchGripper();
-delay(GripperDelay);
-// hij moet nu weer naar boven en naar zijn hart toe 
-SwitchEnd();
-SwitchHead();
-delay(HeadDelay);
+    // hij gaat nu naar voren toe 
+    SwitchHead();
+    delay(HeadDelay);
+    // hij doet nu zijn gripper open 
+    SwitchGripper();
+    delay(GripperDelay);
+    // hij gaat nu naar beneden
+    SwitchEnd();
+    delay(EndDelay);
+    // hij gaat nu de diabol pakken
+    SwitchGripper();
+    delay(GripperDelay);
+    // hij moet nu weer naar boven en naar zijn hart toe 
+    SwitchEnd();
+    SwitchHead();
+    delay(HeadDelay);
 
 
-// vanaf hier heeft hij de daibol in zijn hand
-Serial.println("ik heb H diabol in mijn handen en ben weer terug in mijn hart");
+    // vanaf hier heeft hij de daibol in zijn hand
+    Serial.println("ik heb H diabol in mijn handen en ben weer terug in mijn hart");
 
-int i;
+    int i;
 
-for(i = 0; i < 4; i++){
-  // hij gaat nu naar de volgende toe 
-  StepperHead.step(calculateSteps(HdiabolD[i]));
-  calculateSDelay(calculateSteps(HdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
-  // hij moet nu weer zijn standaart programma draaien door naar voren te gaan open te doen en snel neer ze zetten voor een paar seconde 
-  Serial.println("ik ga nu beginnen met een punt te verzamelen voor de liggende diabol");
-  gatherpoint();
-  Serial.println("ik heb net een punt verzamelt veder naar de volgende !"); 
-}
-if (i == 4){
-// L diabol moet nu naar zijn rust positie worden gebracht. dit is in de array de 5e positie 
-  StepperHead.step(calculateSteps(HdiabolD[i]));
-  calculateSDelay(calculateSteps(HdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+    for(i = 0; i < 4; i++){
+      // hij gaat nu naar de volgende toe 
+      StepperHead.step(calculateSteps(HdiabolD[i]));
+      calculateSDelay(calculateSteps(HdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+      // hij moet nu weer zijn standaart programma draaien door naar voren te gaan open te doen en snel neer ze zetten voor een paar seconde 
+      Serial.println("ik ga nu beginnen met een punt te verzamelen voor de liggende diabol");
+      gatherpoint();
+      Serial.println("ik heb net een punt verzamelt veder naar de volgende !"); 
+    }
+    if (i == 4){
+    // L diabol moet nu naar zijn rust positie worden gebracht. dit is in de array de 5e positie 
+      StepperHead.step(calculateSteps(HdiabolD[i]));
+      calculateSDelay(calculateSteps(HdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
 
-  SwitchHead();
-  delay(HeadDelay);
-  SwitchEnd();
-  delay(EndDelay);
-  SwitchGripper();
-  SwitchEnd();
-  delay(EndDelay);
-  // hier zorgt hij ervoor dat hij terug naar de kern kan en daarabij ook weer zijn gripper reset 
-  SwitchGripper();
-  SwitchHead();
-  delay(HeadDelay);
-// hij zit nu weer in zijn center na de strategie voor de l diabol te hebben uitgevoert
+      SwitchHead();
+      delay(HeadDelay);
+      SwitchEnd();
+      delay(EndDelay);
+      SwitchGripper();
+      SwitchEnd();
+      delay(EndDelay);
+      // hier zorgt hij ervoor dat hij terug naar de kern kan en daarabij ook weer zijn gripper reset 
+      SwitchGripper();
+      SwitchHead();
+      delay(HeadDelay);
+    // hij zit nu weer in zijn center na de strategie voor de l diabol te hebben uitgevoert
 
-// hij onthoud waar hij de daibol heeft neergezet. eigelijk alleen maar nodig voor de eerste keer.
-PDiabolH = HdiabolD[i];
-
-
-Serial.println("ik ben klaar met puntjes verzamelen yay ! nu op naar de L diabol!");
+    // hij onthoud waar hij de daibol heeft neergezet. eigelijk alleen maar nodig voor de eerste keer.
+    PDiabolH = HdiabolD[i];
 
 
-// en hier schakelt hij weer om naar de volgende state. zodat hij weet wat hij moet doen
-SwitchState();
-}
-}
+    Serial.println("ik ben klaar met puntjes verzamelen yay ! nu op naar de L diabol!");
+
+
+    // en hier schakelt hij weer om naar de volgende state. zodat hij weet wat hij moet doen
+    SwitchState();
+    }
+  }
 }
 }
 
@@ -779,24 +795,16 @@ SwitchState();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //start main code 
 void setup(){
-  //start serial met Baudrate
-
-  // hij begint met zijn head in de center en hij moet altijd met zijn gripper bij de 0 positiei worden neer gezet want hier werken de andere functies op 
-  HeadS = 0;
-  
-
-
-
-
-
+  //start serial met Baudrate voor debugging
   Serial.begin(9600);
   
   //example stepper.begin(RPM, MICROSTEPS); Start de steppers
   StepperBase.setSpeed(StepperBaseRPM);
   StepperHead.setSpeed(StepperHeadRPM);
   StepperEnd.setSpeed(StepperEndRPM);
-  //pinmode aangeven
 
+
+  //pinmode aangeven Sonic sensors
   pinMode(TrigPinS1, OUTPUT);
   pinMode(EchoPinS1, INPUT);
   pinMode(TrigPinS2, OUTPUT);
@@ -804,8 +812,7 @@ void setup(){
   pinMode(TrigPinS3, OUTPUT);
   pinMode(EchoPinS3, INPUT);
 
-// servo aan pin 13 koppelen
-  Gripper.attach(13);
+  Gripper.attach(Gripperpin);
 
 
   // de begin functie een van de grootste functies 
@@ -819,7 +826,7 @@ void setup(){
 void loop() {
 
 
-
+// hij gaat dus aan de hand van de daibol h/l punten verzamelen en daarna legt hij hem in zijn rust positie op een vakje met 0 punten
 MaingameS();
 // en hij moet ook nog na 5 min kijken of deze voorbij zijn maar deze funcie is een van de velen die gecshrapt is voor nu .
 Serial.println("ik heb 4 punten verzameld naar de volgende toe ");
@@ -827,4 +834,6 @@ delay(2000);
 
 
 }
-// het is justin zijn schult als dit niet werkt
+
+
+// het is justin zijn schult als dit niet werkt !!
