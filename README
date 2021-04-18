@@ -32,3 +32,7 @@ algemeene zaken waar rekening mee moet worden gehouden en aanwijzingen voor het 
     het stop symbol niet snel ingeprogrameerd en kan de code veel sneller door de delays te verminderen niet te veel 
     hier modet dus nog meer getest mee worden
 
+7.  en gebruik toch flowcharts dit helpt met logica fouten die 90% van de fouten zijn waarom iets niet werkt zodat ooit
+    meschien de code in een keer wil gaan runnen dit heb ik zelf gemerkt dat dit 90% van de fouten zijn in mijn logica van net 
+    toch een stap voor een andere stap doen of iets verkeerd aanroepen op het verkeerde moment de syntax is bijna nooit de fouten
+    omdat wij visual studio code gebruiken
