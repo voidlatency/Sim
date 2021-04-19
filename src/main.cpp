@@ -5,7 +5,7 @@
 //rpm per motor
 #define StepperHeadRPM 60
 #define StepperEndRPM 60
-#define StepperBaseRPM 40
+#define StepperBaseRPM 20
 
 // afstand tot de grond voor het bereken van de werkelijk hoogte omgedraait 
 #define distancetoground 10
@@ -32,6 +32,7 @@ Stepper StepperHead = Stepper(200, 25, 27 , 29, 31);
 //servo
 Servo Gripper;
 #define Gripperpin 13
+
 //zet zones op en geeft deze waardes op opgeroepen te worden zie foto verdeling voor veder uitleg
 int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125, 133, 142, 150, 158, 166, 175, 183, 191};
 // belangerijke zones
@@ -115,7 +116,6 @@ BasePos = Target;
   return(Steps);
 }
 
-
 //  kan ook iets fout mee gaan 
 float calculateSDelay(int Step, int StepperRPM){
 SDelay = abs(Step/(StepperRPM * 0.006));
@@ -145,12 +145,13 @@ void SwitchHead(){
  }
 
 
- if(HeadS == 1){
+ else{
    StepperHead.step(-40);
    calculateSDelay(-40, StepperHeadRPM);
    //head is in middle position 
     HeadS = 0; 
  }
+
 }
 
 
@@ -171,7 +172,7 @@ void SwitchEnd(){
     }
   }
 
-  if(StateDiabolL == true){
+  else{
     StepperEnd.step(343);
     EndS = 0 ;   //gripper is in lowposition for low diabolo 
     if(EndS == 0){
@@ -182,16 +183,9 @@ void SwitchEnd(){
     }
   }
 
-  else{
-    Serial.println("error game state niet gevonden end kan niet switchen");
   }
 
-  // if state diabolo is H 
-  // hoe laag moet de grijper zakken 
-  // else hoe laag moet de grijper zakken voor de diabolo L
- }
-
-
+ 
 
 
 void SwitchGripper(){
@@ -200,14 +194,14 @@ void SwitchGripper(){
 // hier hoeft dus niet meer voor geprogrameerd te worden. 
 if (GripperS == 0){ // hij is dicht dus nu open
 Gripper.write(180);
+Serial.println("mijn gripper is nu open");
 GripperS = 1;
 }
-if (GripperS == 1){ // is open dus nu dicht 
-Gripper.write(90);
+
+else{ // is open dus nu dicht 
+Gripper.write(70);
+Serial.println("mijn gripper is nu dicht");
 GripperS = 0;
-}
-else{
-  Serial.println("error");
 }
 }
 
@@ -447,8 +441,7 @@ void Begin(){
 
 
   // de gripper open zetten omdat hij nog niks te pakken heeft in het begin 
-  Gripper.write(180);
-  GripperS = 1;
+ 
 
   StepperHead.step(40);
   // onthoud hij denk dat hij nog bij de center is de heads state is 0 maar hij zit wel in midden
@@ -812,11 +805,13 @@ void setup(){
   pinMode(TrigPinS3, OUTPUT);
   pinMode(EchoPinS3, INPUT);
 
+
+// geripper op x
   Gripper.attach(Gripperpin);
+  Gripper.write(180);
+  GripperS = 1;
 
 
-  // de begin functie een van de grootste functies 
-  Begin();
 }
 
 
@@ -826,12 +821,9 @@ void setup(){
 void loop() {
 
 
-// hij gaat dus aan de hand van de daibol h/l punten verzamelen en daarna legt hij hem in zijn rust positie op een vakje met 0 punten
-MaingameS();
-// en hij moet ook nog na 5 min kijken of deze voorbij zijn maar deze funcie is een van de velen die gecshrapt is voor nu .
-Serial.println("ik heb 4 punten verzameld naar de volgende toe ");
-delay(2000);
+SwitchGripper();
 
+delay(2000);
 
 }
 
