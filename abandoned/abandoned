@@ -176,3 +176,33 @@ else{
 }
 
 
+
+
+
+
+void SwitchState(){
+  // hij switched van gamestate dit moet elke keer ndadat hij de gameS heeft afgelopen
+
+  //hier moet switchen van state en daarbij de ene diabol neerleggen en de ander op pakken
+  if (StateDiabolH == 1){
+    // hij gaat nu de andere diabol op pakken
+
+    // de game direction moet vedanderen nadat hij de vorige heeft afgezet 
+    // dus rewrite gamestate met Cw als Ddiabol h = 1 en andersom
+    // switch van state
+    StateDiabolL = 1;
+    StateDiabolH = 0;
+}
+  if (StateDiabolL == 1){
+    // hij gaat nu de andere diabol op pakken
+    //switch van state
+    StateDiabolL = 0;
+    StateDiabolH = 1;
+}
+  else{
+  //error
+  Serial.println("Critical error Diabolo state Unknown");
+}
+}
+
+

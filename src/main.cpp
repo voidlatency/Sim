@@ -24,8 +24,17 @@
 #define HeadDelay 1000
 #define GripperDelay 1000
 
+
+// de grens als hij grooter is dan dit getal is hij hoog en als ij alger is dan dit getal dan hebben wij te maken met een liggende diabol of andersom dit moet nog getest worden 
+#define BoundaryDiabolAverage 8
+
+
+//hoever de grijper naar beneden of naar boven moet dus stepper end 
+#define EndStepsHigh 20
+#define EndStepsLow 30
+
 // de end stepper
-Stepper StepperEnd = Stepper(200, 2, 3, 4, 5);
+Stepper StepperEnd = Stepper(2000, 2, 3, 4, 5);
 Stepper StepperBase = Stepper(200,8 ,9 ,10 ,11 );
 Stepper StepperHead = Stepper(200, 25, 27 , 29, 31);
 
@@ -63,9 +72,8 @@ int BasePos = zone[1];; // de basis waar hij op dit moment zich bevind
 int PDiabolH;
 int PDiabolL;
 
-// geeft de state van die machine aan 
-int StateDiabolL;
-int StateDiabolH;
+// geeft de state van die machine aan 1 is H diabol 0 is L diabol
+int Gamestate = 0; // de 0 moet later weg 
 
 // 0 is dicht 1 is open
 int GripperS = 0;
@@ -80,17 +88,11 @@ float SensorReading[40];
 
 int tijdverlopen; 
 
-// sensor afstand 
+// sensor afstand en gemiddelde 
 float SonicDistanceS1;  
 float SonicDistanceS2; 
 float SonicDistanceS3; 
-
 float TotalAverage; 
-
-bool Diabololaying;  
-bool Diabolostanding;
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // calculation functions
@@ -159,25 +161,33 @@ void SwitchEnd(){
 
 
 
-  if(StateDiabolH == true){
-    StepperEnd.step(342);
-    EndS = 1;    // gripper is in low positition for high diabolo 
-    if(EndS == 1 ){
-      StepperEnd.step(-342);
+  if(Gamestate == 1){
+    // de gripper moet minder ver naar beneden omdate de gamestate h is 
+    if(EndS == 0 ){
+      // hij is dus nu hoog en moet naar beneden
+      StepperEnd.step(-EndStepsHigh);
+      EndS = 1;
+      Serial.println("mijn kopstuk gaat nu naar beneden toe voor de hooge diabol");
     }
     else{
+      StepperEnd.step(EndStepsHigh);
        EndS = 0; 
+       Serial.println("mijn kopstuk gaat nu naar boven toe voor de hooge diabol");
     }
   }
 
   else{
-    StepperEnd.step(343);
-    EndS = 0 ;   //gripper is in lowposition for low diabolo 
+   //de gripper moet veder naar beneden omdat de gamestate l is  
     if(EndS == 0){
-       StepperEnd.step(-343);
+      // hij is dus nu hoog en moet naar beneden
+      StepperEnd.step(-EndStepsHigh);
+      EndS = 1;
+      Serial.println("mijn kopstuk gaat nu naar beneden toe voor de lage diabol");
     }
     else{
-      EndS = 1 ; 
+      StepperEnd.step(EndStepsHigh);
+      EndS = 0 ; 
+      Serial.println("mijn kopstuk gaat nu naar boven toe voor de lage diabol");
     }
   }
 
@@ -213,7 +223,7 @@ int HighLowScan(){
   // de functie voor het bepaalen of hij ligt op staat 
   int duration;
   // 1 is h 0 is l
-  int Position = 1;
+  int Position;
 
 
 // hij zit nog in het midden op dit moment en moet eerst dus nog 40 stappe nnaarachteren om echt het hele vak af te gaan
@@ -287,11 +297,11 @@ total = SensorReading[i] + total;
 float average = total/40;
 
 // hij is nu klaar met het gemmidelde te bereken
-if (average <= 7.9){      // is random getal
+if (average <= BoundaryDiabolAverage){      // is random getal
 // hij ligt 
 Position = 0;
 }
-if (average >= 8){        // is random getal
+if (average > BoundaryDiabolAverage){        // is random getal
 // hij staat recht op
 Position = 1;
 }
@@ -412,9 +422,22 @@ Serial.println(SonicDistanceS3);
 
 // hij moet de diabol neerzetten voor een paar seconde en dan weer oppakken en naar zijn rust positie gaan dit kan ook getest worden los 
 
+void SwitchState(){
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 void gatherpoint(){
-
-
 // gaat dus eerst weer naar vooren toe 
 SwitchHead();
 delay(1000);
@@ -434,13 +457,12 @@ SwitchHead();
 delay(2000);
 }
 
+
+
+
 void Begin(){
+
 // pas op omdat de safety feature weg is betekend dat de machine onverwachte dingen kan doen wanneer er een diabol op vak 0 ligt dit is op te lossen met een functie later maar let hier bij op
-
-
-  // de gripper open zetten omdat hij nog niks te pakken heeft in het begin 
- 
-
   StepperHead.step(40);
   // onthoud hij denk dat hij nog bij de center is de heads state is 0 maar hij zit wel in midden
   // kijken of dit wel handig is want het midden is al switch maar dit kan voor nu worden genegeerd kijk of dit bij sim 3 van toepassing is
@@ -500,14 +522,11 @@ for(loop = 0; loop < 5; loop++) {
     }
   }
 }
-
-
+}
 
 // bij sim 3 moet hier ook nog in gezet worden dat hi jde 1e diabol in het midden legt of maak het nog complexer dat naast h en laag en de positie ook onthouden word wat de afstand is dit is niet heel moeilijk als je nog een variable aanmaakt
 // hier mogen jullie lekker naar kijken de volgende keer!
 
-
-}
 
 
 Serial.println("ik gaat nu zoeken naar de 2e diabol");
@@ -535,6 +554,9 @@ if (averagesensor > 0){
 
  
   if(S == 1){
+
+
+
 Serial.println("de 2e diabol is Hoog");
 // hij moet nu de array overschrijven 
     for(loop = 0; loop < 5; loop++) {
@@ -543,10 +565,13 @@ Serial.println("de 2e diabol is Hoog");
 
            // en nog onthouden dat de 1e diabol op deze positie ligt
       PDiabolH = zone[i];
-      StateDiabolH = 1;     // hij begint nu dus bij h
+      Gamestate = 1;     // hij begint nu dus bij h
       BasePos = zone[i];
     }
   } 
+
+
+
   if(S == 0){
 Serial.println("de 2e diabol is Laag");
 // hij moet nu de array voor de stappen overschrijven
@@ -555,13 +580,14 @@ for(loop = 0; loop < 5; loop++) {
 
            // en nog onthouden dat de 1e diabol op deze positie ligt
       PDiabolL = zone[i];
-      StateDiabolL = 1;
+      Gamestate = 0;
       BasePos = zone[i];
     }
   }
 }
-
 }
+
+
 Serial.println("hij heeft beide diabolen gevonden en geindiceerd welke kant hij op moet draaien");
 
 StepperHead.step(-40);
@@ -570,48 +596,7 @@ StepperHead.step(-40);
 // de begin game state is ook al bepaald 
 // dit is alles wat nodig is om het spel te beginnen 
 
-
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-void SwitchState(){
-  // hij switched van gamestate dit moet elke keer ndadat hij de gameS heeft afgelopen
-
-  //hier moet switchen van state en daarbij de ene diabol neerleggen en de ander op pakken
-  if (StateDiabolH == 1){
-    // hij gaat nu de andere diabol op pakken
-
-    // de game direction moet vedanderen nadat hij de vorige heeft afgezet 
-    // dus rewrite gamestate met Cw als Ddiabol h = 1 en andersom
-    // switch van state
-    StateDiabolL = 1;
-    StateDiabolH = 0;
-}
-  if (StateDiabolL == 1){
-    // hij gaat nu de andere diabol op pakken
-    //switch van state
-    StateDiabolL = 0;
-    StateDiabolH = 1;
-}
-  else{
-  //error
-  Serial.println("Critical error Diabolo state Unknown");
-}
-}
-
-
 
 
 
@@ -621,7 +606,7 @@ void MaingameS(){
 // kies eerst tussen de gamestate welke state zijn wij nu in ?
 // vooraf conclusie om het makkelijker te maken voor kopieeren en plakken
 // hij is nu bezig met het laage diabol
-if (StateDiabolL == 1){
+if (Gamestate == 0){
     // hij moet eerst naar de l diabol toe 
     StepperBase.step(calculateSteps(PDiabolL));
     calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
@@ -691,8 +676,9 @@ if (StateDiabolL == 1){
 
 
 }
+}
 // hij zit in de H gamestate
-if (StateDiabolH == 1){
+if (Gamestate == 1){
     // hij moet eerst naar de H diabol toe 
     StepperBase.step(calculateSteps(PDiabolL));
     calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
@@ -762,7 +748,7 @@ if (StateDiabolH == 1){
     }
   }
 }
-}
+
 
 
 
@@ -822,8 +808,10 @@ void setup(){
 
 
 void loop() {
-SwitchGripper();
+
+SwitchEnd();
 delay(2000);
+
 }
 
 
