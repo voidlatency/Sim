@@ -34,7 +34,7 @@
 #define EndStepsLow 30
 
 // de end stepper
-Stepper StepperEnd = Stepper(2000, 2, 3, 4, 5);
+Stepper StepperEnd = Stepper(2048, 2, 3, 4, 5);
 Stepper StepperBase = Stepper(200,8 ,9 ,10 ,11 );
 Stepper StepperHead = Stepper(200, 25, 27 , 29, 31);
 
