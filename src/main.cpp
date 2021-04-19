@@ -40,7 +40,9 @@ Stepper StepperHead = Stepper(200, 25, 27 , 29, 31);
 
 //servo
 Servo Gripper;
+Servo RopeServo;
 #define Gripperpin 13
+#define RopeServoPin 15
 
 //zet zones op en geeft deze waardes op opgeroepen te worden zie foto verdeling voor veder uitleg
 int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125, 133, 142, 150, 158, 166, 175, 183, 191};
@@ -163,14 +165,20 @@ void SwitchEnd(){
 
   if(Gamestate == 1){
     // de gripper moet minder ver naar beneden omdate de gamestate h is 
+    // er staat nu ook code voor de servo 
+
+
+
     if(EndS == 0 ){
       // hij is dus nu hoog en moet naar beneden
       StepperEnd.step(-EndStepsHigh);
+     //RopeServo.write(180);
       EndS = 1;
       Serial.println("mijn kopstuk gaat nu naar beneden toe voor de hooge diabol");
     }
     else{
       StepperEnd.step(EndStepsHigh);
+      //RopeServo.write(20);
        EndS = 0; 
        Serial.println("mijn kopstuk gaat nu naar boven toe voor de hooge diabol");
     }
@@ -181,11 +189,13 @@ void SwitchEnd(){
     if(EndS == 0){
       // hij is dus nu hoog en moet naar beneden
       StepperEnd.step(-EndStepsHigh);
+     //RopeServo.write(180);
       EndS = 1;
       Serial.println("mijn kopstuk gaat nu naar beneden toe voor de lage diabol");
     }
     else{
       StepperEnd.step(EndStepsHigh);
+      //RopeServo.write(0);
       EndS = 0 ; 
       Serial.println("mijn kopstuk gaat nu naar boven toe voor de lage diabol");
     }
@@ -422,19 +432,16 @@ Serial.println(SonicDistanceS3);
 
 // hij moet de diabol neerzetten voor een paar seconde en dan weer oppakken en naar zijn rust positie gaan dit kan ook getest worden los 
 
+
+// hij moet nu wisselen van state 
 void SwitchState(){
-
+if (Gamestate == 1){
+  Gamestate = 0;
 }
-
-
-
-
-
-
-
-
-
-
+else{
+  Gamestate = 1;
+}
+}
 
 
 void gatherpoint(){
@@ -800,6 +807,8 @@ void setup(){
   Gripper.write(180);
   GripperS = 1;
 
+  RopeServo.attach(RopeServoPin);
+
 
 }
 
@@ -809,10 +818,14 @@ void setup(){
 
 void loop() {
 
-SwitchEnd();
-delay(2000);
 
+
+// eigelijk 
+RopeServo.write(0);
+delay(2000);
+RopeServo.write(180);
+delay(2000);
 }
 
 
-// het is justin zijn schult als dit niet werkt !!
+// het is justin zijn schuld als dit niet werkt !!
