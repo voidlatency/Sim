@@ -85,9 +85,7 @@ float SonicDistanceS1;
 float SonicDistanceS2; 
 float SonicDistanceS3; 
 
-
 float TotalAverage; 
-
 
 bool Diabololaying;  
 bool Diabolostanding;
@@ -474,9 +472,13 @@ for(i = 0 ; unknown == 2; i++){
 // berekent of een iets ziet door ze gewoon bij elkaar op te tellen wel gevoelig voor foute lezingen
 averagesensor = SonicDistanceS1 + SonicDistanceS2 + SonicDistanceS3;
 if (averagesensor > 0){
+
   unknown++;
   Serial.println("hij heeft de eerste Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
-S = HighLowScan();
+  // terug naar de kern toe 
+  S = HighLowScan();
+
+
 if(S == 1){
 Serial.println("de 1e diabol is Hoog");
 // hij moet nu de array overschrijven 
@@ -531,6 +533,7 @@ if (averagesensor > 0){
   unknown++;
   Serial.println("ik heb de tweede Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
 
+ 
   if(S == 1){
 Serial.println("de 2e diabol is Hoog");
 // hij moet nu de array overschrijven 
@@ -561,7 +564,7 @@ for(loop = 0; loop < 5; loop++) {
 }
 Serial.println("hij heeft beide diabolen gevonden en geindiceerd welke kant hij op moet draaien");
 
-StepperBase.step(-40);
+StepperHead.step(-40);
 // is dit het eind deel van begin ?
 // posities van de diabolen zijn al bekent nu en of ze hoog en laag zijn
 // de begin game state is ook al bepaald 
@@ -819,12 +822,8 @@ void setup(){
 
 
 void loop() {
-
-
 SwitchGripper();
-
 delay(2000);
-
 }
 
 
