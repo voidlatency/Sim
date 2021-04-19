@@ -36,3 +36,16 @@ algemeene zaken waar rekening mee moet worden gehouden en aanwijzingen voor het 
     meschien de code in een keer wil gaan runnen dit heb ik zelf gemerkt dat dit 90% van de fouten zijn in mijn logica van net 
     toch een stap voor een andere stap doen of iets verkeerd aanroepen op het verkeerde moment de syntax is bijna nooit de fouten
     omdat wij visual studio code gebruiken
+
+8. de huidige code zorgt er ook voor als hij door draait bij het scannen naar een diabol dat er kans ik dat hij iets om ver stoot
+    er moet dus rekening mee worden gehouden dat als hij iets vin dat hij het ook gaat ontwijken. dit moet echt bij sim3 worden
+    toegevoegt en als het kan bij sim2 al. kijk of dit niet een heel groot probleem word. er is hier al een begin aan gemaakt
+    bij de begin functie hij gaat dus naar achter en dan weer naar voren bij sim 2 is het meschien beter om een grijper te hebben die 
+    over de diabol heen kan gaan. 
+
+9.  het is niet makkelijk om het op en neer gaan te ontkomen die ontstaat nadat hij switched van begin naar main game state
+    als je echt wilt optimizen moet je een tussen state dan maken die hij gebruikt voor de eerste keer een punt te verzamelen aan de hand van of
+    hij eerst laag of hoog heeft gevonden dus eerst if en dan de eerste punt verzamelen zodat hij dan daarna pas zijn loop funcite gaat beginnen
+    dus deze functie moet ook in de setup staan omdat hij maar een keer voor komt. dus iets in de lijn van First diabol start.
+
+10. 
