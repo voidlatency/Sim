@@ -23,7 +23,6 @@
 #define HeadDelay 1000
 #define GripperDelay 1000
 
-
 // de grens als hij grooter is dan dit getal is hij hoog en als ij alger is dan dit getal dan hebben wij te maken met een liggende diabol of andersom dit moet nog getest worden 
 #define BoundaryDiabolAverage 8
 #define Scanofset 3
@@ -40,9 +39,9 @@ Stepper StepperHead = Stepper(200, 25, 27 , 29, 31);
 Servo Gripper;
 Servo RopeServo;
 
-
-#define Gripperpin 15
-#define RopeServoPin 13
+//pins voor de servo's
+#define Gripperpin 52
+#define RopeServoPin 53
 
 //zet zones op en geeft deze waardes op opgeroepen te worden zie foto verdeling voor veder uitleg
 int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125, 133, 142, 150, 158, 166, 175, 183, 191};
@@ -118,7 +117,8 @@ BasePos = Target;
   return(Steps);
 }
 
-//  kan ook iets fout mee gaan 
+
+
 float calculateSDelay(int Step, int StepperRPM){
 SDelay = abs(Step/(StepperRPM * 0.006));
 
@@ -161,22 +161,15 @@ void SwitchHead(){
 void SwitchEnd(){
  // voor dit project is dit meschien niet nodig kijk of hij wel echt naar boven of naar beneden moet 
 
-
-
   if(Gamestate == 1){
-    // de gripper moet minder ver naar beneden omdate de gamestate h is 
-    // er staat nu ook code voor de servo 
-
-
-
     if(EndS == 0 ){
       // hij is dus nu hoog en moet naar beneden
-     RopeServo.write(180);
+     RopeServo.write(150);      // minder ver naar beneden voor de hooge diabol
       EndS = 1;
       Serial.println("mijn kopstuk gaat nu naar beneden toe voor de hooge diabol");
     }
     else{
-      RopeServo.write(20);
+      RopeServo.write(0);
        EndS = 0; 
        Serial.println("mijn kopstuk gaat nu naar boven toe voor de hooge diabol");
     }
@@ -537,9 +530,7 @@ for(loop = 0; loop < 5; loop++) {
 // hier mogen jullie lekker naar kijken de volgende keer!
 
 
-
 Serial.println("ik gaat nu zoeken naar de 2e diabol");
-
 
 // hij gaat veder met de stappen die hij al had gedaan
 for(; unknown == 1; i++){
@@ -550,7 +541,6 @@ Serial.println("ik heb niks gevonden in het vak gaat naar de volgende ");
 StepperBase.step(calculateSteps(zone[i+1] - Scanofset));
 delay(1000);
 
-
 PingSensors();
 
 // berekent of een iets ziet door ze gewoon bij elkaar op te tellen wel gevoelig voor foute lezingen
@@ -560,21 +550,14 @@ if (averagesensor > 0){
   S = HighLowScan();
   unknown++;
   Serial.println("ik heb de tweede Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
-
- 
   if(S == 1){
-
-
-
-Serial.println("de 2e diabol is Hoog");
-// hij moet nu de array overschrijven 
+    Serial.println("de 2e diabol is Hoog");
+    // hij moet nu de array overschrijven 
     for(loop = 0; loop < 5; loop++) {
       HdiabolD[loop] = CCW[loop];
-
-
            // en nog onthouden dat de 1e diabol op deze positie ligt
       PDiabolH = zone[i];
-      Gamestate = 1;     // hij begint nu dus bij h
+      Gamestate = 1;     
       BasePos = zone[i];
     }
   } 
@@ -813,7 +796,7 @@ void setup(){
 
 
 
-
+  Begin();
 }
 
 
