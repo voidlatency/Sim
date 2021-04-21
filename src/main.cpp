@@ -4,19 +4,19 @@
 
 //rpm per motor
 #define StepperHeadRPM 60
-#define StepperBaseRPM 20
+#define StepperBaseRPM 5
 
 // afstand tot de grond voor het bereken van de werkelijk hoogte omgedraait 
-#define distancetoground 10
+#define distancetoground 7
 
 // pins voor de sensoren
-#define TrigPinS1 43  
-#define TrigPinS2 47 
-#define TrigPinS3 51 
+#define TrigPinS1 41  
+#define TrigPinS2 36
+#define TrigPinS3 39
 
-#define EchoPinS1 45
-#define EchoPinS2 49
-#define EchoPinS3 53
+#define EchoPinS1 40
+#define EchoPinS2 37
+#define EchoPinS3 38
 
 //example : BasicStepperDriver stepper(MOTOR_STEPS, DIR, STEP);
 #define EndDelay 1000
@@ -24,15 +24,19 @@
 #define GripperDelay 1000
 
 // de grens als hij grooter is dan dit getal is hij hoog en als ij alger is dan dit getal dan hebben wij te maken met een liggende diabol of andersom dit moet nog getest worden 
-#define BoundaryDiabolAverage 8
+#define BoundaryDiabolAverage 10     
 #define Scanofset 3
 
 //hoever de grijper naar beneden of naar boven moet dus stepper end 
 #define EndStepsHigh 20
 #define EndStepsLow 30
 
+// de afstand die hij neemt voor het herkennen of er een diabol is hier gaat het steeds fout. 
+#define distancetodabol 8.5 
+
+
 // de end stepper
-Stepper StepperBase = Stepper(200,8 ,9 ,10 ,11 );
+Stepper StepperBase = Stepper(200, 45 ,47 ,49 ,51 );
 Stepper StepperHead = Stepper(200, 25, 27 , 29, 31);
 
 //servo
@@ -40,12 +44,13 @@ Servo Gripper;
 Servo RopeServo;
 
 //pins voor de servo's
-#define Gripperpin 52
-#define RopeServoPin 53
+#define Gripperpin 3
+#define RopeServoPin 4
 
 //zet zones op en geeft deze waardes op opgeroepen te worden zie foto verdeling voor veder uitleg
 int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125, 133, 142, 150, 158, 166, 175, 183, 191};
 // belangerijke zones
+// -1 is dus het begin veld waar hij moet beginnen 
 // 20 punten zone[5]
 // 14 punten zone[7]
 // 16 punten zone[19]
@@ -58,13 +63,9 @@ int CCW[5] = { 142, 158, 41, 58, 83} ; //counterclockwise
 // de laaste is rust positie 
 // 0 is rust positie van de diabolo
 
-
 int HdiabolD[5];     // de richting van H diabol
 int LdiabolD[5];     // de richting van L diabol
 // 1 is met klok mee 0 is tegen de klok in 
-
-
-
 
 float SDelay;  //delay voor tussen de steppen
 int BasePos = zone[1];; // de basis waar hij op dit moment zich bevind 
@@ -90,10 +91,9 @@ float SensorReading[40];
 int tijdverlopen; 
 
 // sensor afstand en gemiddelde 
-float SonicDistanceS1;  
-float SonicDistanceS2; 
-float SonicDistanceS3; 
-float TotalAverage; 
+float SonicDistanceS1 = 10;  
+float SonicDistanceS2 = 10; 
+float SonicDistanceS3 = 10; 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 // calculation functions
@@ -141,15 +141,15 @@ void SwitchHead(){
 
 
  //head is in base position 
-   StepperHead.step(40);
-  calculateSDelay(40, StepperHeadRPM);
+   StepperHead.step(80);
+  calculateSDelay(80, StepperHeadRPM);
    HeadS = 1; 
  }
 
 
  else{
-   StepperHead.step(-40);
-   calculateSDelay(-40, StepperHeadRPM);
+   StepperHead.step(-80);
+   calculateSDelay(-80, StepperHeadRPM);
    //head is in middle position 
     HeadS = 0; 
  }
@@ -164,12 +164,12 @@ void SwitchEnd(){
   if(Gamestate == 1){
     if(EndS == 0 ){
       // hij is dus nu hoog en moet naar beneden
-     RopeServo.write(150);      // minder ver naar beneden voor de hooge diabol
+     RopeServo.write(105);      // minder ver naar beneden voor de hooge diabol
       EndS = 1;
       Serial.println("mijn kopstuk gaat nu naar beneden toe voor de hooge diabol");
     }
     else{
-      RopeServo.write(0);
+      RopeServo.write(180);
        EndS = 0; 
        Serial.println("mijn kopstuk gaat nu naar boven toe voor de hooge diabol");
     }
@@ -179,20 +179,17 @@ void SwitchEnd(){
    //de gripper moet veder naar beneden omdat de gamestate l is  
     if(EndS == 0){
       // hij is dus nu hoog en moet naar beneden
-     RopeServo.write(180);
+     RopeServo.write(50);
       EndS = 1;
       Serial.println("mijn kopstuk gaat nu naar beneden toe voor de lage diabol");
     }
     else{
-      RopeServo.write(0);
+      RopeServo.write(180);
       EndS = 0 ; 
       Serial.println("mijn kopstuk gaat nu naar boven toe voor de lage diabol");
     }
   }
   }
-
-
-
 
 void SwitchGripper(){
 // 0 is dicht 1 is open
@@ -205,7 +202,7 @@ GripperS = 1;
 }
 
 else{ // is open dus nu dicht 
-Gripper.write(70);
+Gripper.write(75);
 Serial.println("mijn gripper is nu dicht");
 GripperS = 0;
 }
@@ -216,8 +213,6 @@ GripperS = 0;
 ////////////////////////////////////////////////////////////////////////////////////////////
 // sensor funties
 
-
-
 // nog niet af 
 int HighLowScan(){
   // de functie voor het bepaalen of hij ligt op staat 
@@ -227,11 +222,11 @@ int HighLowScan(){
 
 
 // hij zit nog in het midden op dit moment en moet eerst dus nog 40 stappe nnaarachteren om echt het hele vak af te gaan
-  StepperHead.step(-40);
+  StepperHead.step(-80);
 
   for(int i = 0; i < 40; i++){
   //delay om in positie te komen kan nog verandert worden
-  delay(10);
+  delay(5);
 
   // Clears the trigPin condition        //kan er meschien uit 
   digitalWrite(TrigPinS2, LOW);
@@ -243,13 +238,14 @@ int HighLowScan(){
   duration = pulseIn(EchoPinS2, HIGH);
   SensorReading[i]  = duration * 0.034 / 2;   // rekent afstand in cm
   // 2 stappen vooruit weer 
-  StepperHead.step(2);
+  StepperHead.step(4);
+
  // test voor laag en hoog door te printen wat de average is voor een paar keer totdat met trial en error de average vast staan en kijk wat de marigin is als het goed is is het elke keer ongeveer dezelfde waarde 
   Serial.println(SensorReading[i]);
 
 }
 
- StepperHead.step(-40);
+ StepperHead.step(-80);
   Serial.println("hij is weer terug in de center nadat hij heeft gescanned");
 
 // hij moet nu een conclusie gaan trekken uit de sensor array 
@@ -287,11 +283,14 @@ veel suc6 !  hehe
 
 
 // hier moet hij een conclusie gaan trekken nadat het gemiddelde is bertekend
-float total;
+float total = 0;
 for(int i = 0; i < 40; i++){
 total = SensorReading[i] + total;
 }
+
 float average = total/40;
+
+Serial.println(average);
 
 if (average <= BoundaryDiabolAverage){
 // hij ligt 
@@ -322,12 +321,8 @@ int duration;
   digitalWrite(TrigPinS1, LOW);
   duration = pulseIn(EchoPinS1, HIGH);
   SonicDistanceS1 = duration * 0.034 / 2;   // rekent afstand in cm
-  // 2 stappen vooruit weer 
-  Serial.println("1e sensor waarde:");
-  Serial.println(SonicDistanceS1);
 
-
-delay(20);
+delay(50);
 
 // sensor 2 lezing
 // Clears the trigPin condition        //kan er meschien uit 
@@ -339,10 +334,8 @@ delay(20);
   digitalWrite(TrigPinS2, LOW);
   duration = pulseIn(EchoPinS2, HIGH);
   SonicDistanceS2  = duration * 0.034 / 2;   // rekent afstand in cm
-  // 2 stappen vooruit weer 
-  Serial.println("2e sensor waarde:");
-  Serial.println(SonicDistanceS2);
-delay(20);
+
+delay(50);
 
 // sensor 3 lezing
 // Clears the trigPin condition        //kan er meschien uit 
@@ -354,17 +347,8 @@ delay(20);
   digitalWrite(TrigPinS3, LOW);
   duration = pulseIn(EchoPinS3, HIGH);
   SonicDistanceS3 = duration * 0.034 / 2;   // rekent afstand in cm
-  // 2 stappen vooruit weer 
-  Serial.println("3e sensor waarde:");
-  Serial.println(SonicDistanceS3);
 
-delay(20);
-// hier mot hij een pint uitstuuren en daaruit 3 outputs hebben en kijken wat de afstand is tot de sensor 
-SonicDistanceS3 = distancetoground - SonicDistanceS3;
-SonicDistanceS2 = distancetoground - SonicDistanceS2;
-SonicDistanceS1 = distancetoground - SonicDistanceS1;
-
-
+delay(50);
 
 Serial.println("de uiteindelijk afstand tot de grond is op volgorde 1,2,3 is:");
 Serial.println(SonicDistanceS1);
@@ -429,7 +413,7 @@ else{
 
 
 void gatherpoint(){
-// gaat dus eerst weer naar vooren toe 
+// gaat dus eerst weer naar voren toe 
 SwitchHead();
 delay(1000);
 
@@ -460,37 +444,47 @@ void Begin(){
 
 
 
+
+Serial.println("ik ze nu mijn grijper open ");
+  Gripper.write(180);
+  GripperS = 1;
+
+ 
+
+
+delay(1000);
+
 //eerste functie hij gaat ronddeaaien dit is een verzameling van meerdere functies uiteindelijk
-int unknown = 2; // hij heeft dus nog geen van beide gevonden
+int unknown = 0; // hij heeft dus nog geen van beide gevonden
 //de eerste diabol zoeken en bepaalen of hij licht of staat.
 
 // het gemiddelde nodig om te berekenen of een van de 3 sensors iets ziet 
-int averagesensor;
 int loop;
 int i, S;
 
 
 // i is hierbij de hoeveelheid vakjes 
-for(i = 0 ; unknown == 2; i++){
+for(i = 0 ; unknown == 0; i++){
 
   //eerst draait hij naar het volgende vak
   Serial.println("hij heeft niks gevonden in de vak gaat naar de volgende ");
-
   StepperBase.step(calculateSteps(zone[i+1] - Scanofset));
   delay(1000);
 
 // nadat hij naar zijn vak heeft gedraait scant hij
   PingSensors();
+  delay(100);
 
 
-// berekent of een iets ziet door ze gewoon bij elkaar op te tellen wel gevoelig voor foute lezingen
-averagesensor = SonicDistanceS1 + SonicDistanceS2 + SonicDistanceS3;
-if (averagesensor > 0){
-
+// om vals te spelen kan hier voor i een vak worden ingevult en zo de diabol worden ge ahrd coded dus bijvoor beeld i ==5 . 
+if (SonicDistanceS1 < distancetodabol || SonicDistanceS2 < distancetodabol|| SonicDistanceS3 < distancetodabol){
   unknown++;
   Serial.println("hij heeft de eerste Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
+
+
   // terug naar de kern toe 
   S = HighLowScan();
+  // veder om vals t espelen moet je hier aangeven of in dit vlak de diabol hig hof low is. 
 if(S == 1){
 Serial.println("de 1e diabol is Hoog");
 // hij moet nu de array overschrijven 
@@ -511,16 +505,6 @@ for(loop = 0; loop < 5; loop++) {
       PDiabolL = zone[i];
     }
   }
-
-  // hij moet nu ook om de diabol heen naar het volgende vlak 
-
-  StepperHead.step(-40);  // hij moet naar de kern toe om de 1e diabol te ontwijken
-  delay(1000);
-  i++;                    // hij is een vlak veder dit moet bijgehouden worden. ook voor de volgende berekening hier onder  
-  StepperBase.step(calculateSteps(zone[i+1] - Scanofset));
-  delay(1000);
-  StepperHead.step(40);
-  Serial.println("ik heb de eerste diabol ontweeken en ga nu veder naar de 2e diabol");
   }
 
 
@@ -528,9 +512,10 @@ for(loop = 0; loop < 5; loop++) {
 
 // bij sim 3 moet hier ook nog in gezet worden dat hi jde 1e diabol in het midden legt of maak het nog complexer dat naast h en laag en de positie ook onthouden word wat de afstand is dit is niet heel moeilijk als je nog een variable aanmaakt
 // hier mogen jullie lekker naar kijken de volgende keer!
-
-
 Serial.println("ik gaat nu zoeken naar de 2e diabol");
+
+
+
 
 // hij gaat veder met de stappen die hij al had gedaan
 for(; unknown == 1; i++){
@@ -539,17 +524,21 @@ for(; unknown == 1; i++){
 Serial.println("ik heb niks gevonden in het vak gaat naar de volgende ");
 
 StepperBase.step(calculateSteps(zone[i+1] - Scanofset));
-delay(1000);
+delay(2000);
 
 PingSensors();
 
-// berekent of een iets ziet door ze gewoon bij elkaar op te tellen wel gevoelig voor foute lezingen
-averagesensor = SonicDistanceS1 + SonicDistanceS2 + SonicDistanceS3;
-if (averagesensor > 0){
+
+
+if (SonicDistanceS1 < distancetodabol || SonicDistanceS2 < distancetodabol || SonicDistanceS3 < distancetodabol){
   // hij ziet iets en gaat nu de scan functie uitvoeren
   S = HighLowScan();
   unknown++;
   Serial.println("ik heb de tweede Diabol gevonden ga nu bepaalen of hij staan of liggend is ");
+
+
+
+
   if(S == 1){
     Serial.println("de 2e diabol is Hoog");
     // hij moet nu de array overschrijven 
@@ -597,13 +586,17 @@ StepperHead.step(-40);
 // nog lang niet af 
 void MaingameS(){
 
+
+int i = 0;
+
+
 // kies eerst tussen de gamestate welke state zijn wij nu in ?
 // vooraf conclusie om het makkelijker te maken voor kopieeren en plakken
 // hij is nu bezig met het laage diabol
 if (Gamestate == 0){
     // hij moet eerst naar de l diabol toe 
     StepperBase.step(calculateSteps(PDiabolL));
-    calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
+    delay(2000);
     // hij hangt nu boven de liggende diabol
     Serial.println("ik hang nu boven de liggende diabol ik ga nu beginnen met mijn game strategie");
 
@@ -629,12 +622,12 @@ if (Gamestate == 0){
     // vanaf hier heeft hij de daibol in zijn hand
     Serial.println("ik heb L diabol in mijn handen en ben weer terug in mijn hart");
 
-    int i;
+  
 
     for(i = 0; i < 4; i++){
       // hij gaat nu naar de volgende toe 
       StepperHead.step(calculateSteps(LdiabolD[i]));
-      calculateSDelay(calculateSteps(LdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+      delay(2000);  // de delay voor naar positie komen 
       // hij moet nu weer zijn standaart programma draaien door naar voren te gaan open te doen en snel neer ze zetten voor een paar seconde 
       Serial.println("ik ga nu beginnen met een punt te verzamelen voor de liggende diabol");
       gatherpoint();
@@ -643,7 +636,7 @@ if (Gamestate == 0){
     if (i == 4){
     // L diabol moet nu naar zijn rust positie worden gebracht. dit is in de array de 5e positie 
       StepperHead.step(calculateSteps(LdiabolD[i]));
-      calculateSDelay(calculateSteps(LdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+      delay(2000);  // de delay voor naar positie komen 
 
       SwitchHead();
       delay(HeadDelay);
@@ -674,8 +667,8 @@ if (Gamestate == 0){
 // hij zit in de H gamestate
 if (Gamestate == 1){
     // hij moet eerst naar de H diabol toe 
-    StepperBase.step(calculateSteps(PDiabolL));
-    calculateSDelay(calculateSteps(PDiabolL),StepperBaseRPM);
+    StepperBase.step(calculateSteps(PDiabolH));
+    delay(2000);  // de delay voor naar positie komen 
     // hij hangt nu boven de liggende diabol
     Serial.println("ik hang nu boven de staande  diabol ik ga nu beginnen met mijn game strategie");
 
@@ -694,6 +687,7 @@ if (Gamestate == 1){
     delay(GripperDelay);
     // hij moet nu weer naar boven en naar zijn hart toe 
     SwitchEnd();
+    delay(2000);
     SwitchHead();
     delay(HeadDelay);
 
@@ -706,7 +700,7 @@ if (Gamestate == 1){
     for(i = 0; i < 4; i++){
       // hij gaat nu naar de volgende toe 
       StepperHead.step(calculateSteps(HdiabolD[i]));
-      calculateSDelay(calculateSteps(HdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+      delay(2000); // de delay voor naar positie komen 
       // hij moet nu weer zijn standaart programma draaien door naar voren te gaan open te doen en snel neer ze zetten voor een paar seconde 
       Serial.println("ik ga nu beginnen met een punt te verzamelen voor de liggende diabol");
       gatherpoint();
@@ -715,7 +709,7 @@ if (Gamestate == 1){
     if (i == 4){
     // L diabol moet nu naar zijn rust positie worden gebracht. dit is in de array de 5e positie 
       StepperHead.step(calculateSteps(HdiabolD[i]));
-      calculateSDelay(calculateSteps(HdiabolD[i]), StepperBaseRPM);  // de delay voor naar positie komen 
+      delay(2000);  // de delay voor naar positie komen 
 
       SwitchHead();
       delay(HeadDelay);
@@ -726,6 +720,7 @@ if (Gamestate == 1){
       delay(EndDelay);
       // hier zorgt hij ervoor dat hij terug naar de kern kan en daarabij ook weer zijn gripper reset 
       SwitchGripper();
+       delay(2000);
       SwitchHead();
       delay(HeadDelay);
     // hij zit nu weer in zijn center na de strategie voor de l diabol te hebben uitgevoert
@@ -789,31 +784,125 @@ void setup(){
 
 // geripper op x
   Gripper.attach(Gripperpin);
-  Gripper.write(180);
-  GripperS = 1;
-
   RopeServo.attach(RopeServoPin);
 
 
 
-  Begin();
+Serial.println("ik zet nu mijn grijper dicht ");
+  Gripper.write(150);
+  GripperS = 1;
+
+EndS = 0; // hij is naar boven 
+Gamestate = 1;
+
 }
 
-
+//zet zones op en geeft deze waardes op opgeroepen te worden zie foto verdeling voor veder uitleg
+//int zone[24] = {0, 8, 16, 25, 33, 41, 50, 58, 66, 75, 83, 91, 100, 108, 116, 125, 133, 142, 150, 158, 166, 175, 183, 191};
+// belangerijke zones
+// -1 is dus het begin veld waar hij moet beginnen 
+// 20 punten zone[5]
+// 14 punten zone[7]
+// 16 punten zone[19]
+// 18 punten zone[17]
 
 
 
 void loop() {
+delay(5000);
 
 
+StepperBase.step(zone[1] - 5);
+// doe alsof hij iets ziet 
 
-// eigelijk 
-Serial.println("naar boven");
-RopeServo.write(0);
+SwitchHead();
+delay(1000);
+SwitchHead();
+
+// hij ziet nu "iets"
+
+StepperBase.step(zone[3] - zone[1]);
+
+
+SwitchHead();
+delay(1000);
+SwitchHead();
+
+StepperBase.step(5);
+
+
 delay(2000);
-Serial.println("naar beneden");
-RopeServo.write(180);
+SwitchEnd();
+delay(1000);
+SwitchGripper();
+delay(1000);
+SwitchEnd();
+delay(1000);
+
+
+// hij is nu weer omhoog
+
+StepperBase.step(zone[5] - zone[3]);
+
 delay(2000);
+SwitchEnd();
+delay(1000);
+SwitchGripper();
+delay(1000);
+SwitchGripper();
+delay(1000);
+SwitchEnd();
+delay(1000);
+
+StepperBase.step(zone[7] - zone[5]-1);
+
+delay(2000);
+SwitchEnd();
+delay(1000);
+SwitchGripper();
+delay(1000);
+
+
+SwitchEnd();
+delay(1000);
+// hij heeft het nu bij 14 neergezet 
+// hij moet nu weer terug naar de andere diabol. 
+
+Gamestate = 0;
+// hij hangt nu boven het eerste veld 
+StepperBase.step(-zone[6]+1);
+delay(2000);
+SwitchEnd();
+delay(1000);
+SwitchGripper();
+delay(1000);
+SwitchEnd();
+
+StepperBase.step(-zone[6]);
+
+delay(2000);
+SwitchEnd();
+delay(1000);
+SwitchGripper();
+delay(1000);
+SwitchGripper();
+delay(1000);
+SwitchEnd();
+delay(1000);
+
+StepperBase.step(-zone[2] - 4);
+
+
+delay(2000);
+SwitchEnd();
+delay(1000);
+SwitchGripper();
+delay(1000);
+
+
+
+
+// einde
 }
 
 
